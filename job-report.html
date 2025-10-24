@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .hamburger {
+            width: 30px;
+            height: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 3px;
+            background: #667eea;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #10b981;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* Filter Modal */
+        .filter-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .filter-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .filter-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .filter-modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .close-filter {
+            color: #999;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-filter:hover {
+            color: #667eea;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Checkbox Filters */
+        .checkbox-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #f3f4f6;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            flex: 1;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .filter-reset-btn, .filter-apply-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-reset-btn {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        .filter-reset-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .filter-apply-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-apply-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        /* Edit Status Modal */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .edit-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-wrapper {
+            min-width: 1000px;
+        }
+
+        .column-header {
+            font-weight: bold;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: grid;
+            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 0.8fr 1fr 60px;
+            gap: 12px;
+            font-size: 13px;
+            align-items: center;
+        }
+
+        .table-row {
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-header {
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 0.8fr 1fr 60px;
+            gap: 12px;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .row-header:hover {
+            background: #f8f9ff;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #667eea;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-btn.active {
+            transform: rotate(90deg);
+        }
+
+        .edit-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #667eea;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .edit-icon:hover {
+            background: #f0f0ff;
+            color: #5568d3;
+        }
+
+        .cell {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-interviewed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-passed {
+            background: #c7d2fe;
+            color: #3730a3;
+        }
+
+        .status-failed {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .status-contacted {
+            background: #d1d5db;
+            color: #374151;
+        }
+
+        .status-report {
+            background: #f3e8ff;
+            color: #581c87;
+        }
+
+        .status-renounce {
+            background: #e0e7ff;
+            color: #3f0f5c;
+        }
+
+        .status-submit {
+            background: #cffafe;
+            color: #164e63;
+        }
+
+        .collapsed-content {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 0 20px 20px 70px;
+            background: #f9fafb;
+            position: relative;
+        }
+
+        .collapsed-content.show {
+            display: block;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .detail-more-btn-container {
+            position: sticky;
+            left: 70px;
+            right: 20px;
+            margin-top: 10px;
+        }
+
+        .detail-more-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: auto;
+            max-width: calc(100vw - 110px);
+        }
+
+        .detail-more-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #ef4444;
+            font-size: 16px;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 80px 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 15px;
+            }
+
+            .page-title-header {
+                font-size: 16px;
+            }
+
+            .user-profile {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .hamburger {
+                width: 25px;
+                height: 20px;
+            }
+
+            .content {
+                padding: 15px 10px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .filter-controls {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .filter-btn, .refresh-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .filter-modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .filter-modal-title {
+                font-size: 18px;
+            }
+
+            .edit-modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .table-container {
+                border-radius: 10px;
+                margin: 0 -5px;
+            }
+
+            .column-header {
+                padding: 12px 10px;
+                font-size: 11px;
+                gap: 8px;
+            }
+
+            .row-header {
+                padding: 12px 10px;
+                gap: 8px;
+            }
+
+            .cell {
+                font-size: 12px;
+            }
+
+            .status-badge {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+
+            .expand-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+
+            .edit-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+
+            .collapsed-content {
+                padding: 15px 10px 15px 35px;
+            }
+
+            .detail-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .detail-label {
+                font-size: 10px;
+            }
+
+            .detail-value {
+                font-size: 12px;
+                padding: 6px;
+            }
+
+            .detail-more-btn-container {
+                left: 35px;
+                right: 10px;
+                margin-top: 15px;
+            }
+
+            .detail-more-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+                width: 100%;
+                max-width: calc(100vw - 55px);
+                justify-content: center;
+            }
+
+            .pagination-container {
+                padding: 15px 10px 100px 10px;
+                justify-content: center;
+            }
+
+            .pagination-controls {
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .pagination-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .pagination-info {
+                font-size: 12px;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title-header {
+                font-size: 14px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+
+            .filter-btn, .refresh-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                gap: 4px;
+            }
+
+            .filter-btn i, .refresh-btn i {
+                font-size: 11px;
+            }
+
+            .column-header {
+                font-size: 10px;
+                padding: 10px 8px;
+                gap: 6px;
+            }
+
+            .row-header {
+                padding: 10px 8px;
+                gap: 6px;
+            }
+
+            .cell {
+                font-size: 11px;
+            }
+
+            .collapsed-content {
+                padding: 12px 8px 12px 30px;
+            }
+
+            .detail-grid {
+                grid-template-columns: repeat(2, 0.3fr);
+                gap: 8px;
+            }
+
+            .detail-label {
+                font-size: 9px;
+            }
+
+            .detail-value {
+                font-size: 11px;
+                padding: 5px;
+            }
+
+            .detail-more-btn-container {
+                left: 30px;
+                right: 8px;
+                margin-top: 12px;
+            }
+
+            .detail-more-btn {
+                max-width: calc(100vw - 48px);
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="page-title-header">Job Applications</div>
+        </div>
+        <div class="user-profile" id="userProfile">JD</div>
+    </div>
+
+    <div class="content">
+        <div class="content-header">
+            <div class="section-title">รายการผู้สมัครงาน</div>
+            <div class="filter-controls">
+                <button class="filter-btn" onclick="openFilterModal()">
+                    <i class="fa-solid fa-filter"></i> ตัวกรอง
+                </button>
+                <button class="refresh-btn" onclick="loadDataFromGoogleSheets()">
+                    <i class="fa-solid fa-rotate"></i> รีเฟรช
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Modal -->
+        <div id="filterModal" class="filter-modal">
+            <div class="filter-modal-content">
+                <div class="filter-modal-header">
+                    <div class="filter-modal-title">ตัวกรองข้อมูล</div>
+                    <span class="close-filter" onclick="closeFilterModal()">&times;</span>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">วันที่สมัคร (จาก)</label>
+                    <input type="date" class="filter-select" id="dateFromFilter">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">วันที่สมัคร (ถึง)</label>
+                    <input type="date" class="filter-select" id="dateToFilter">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">สถานะ</label>
+                    <div class="checkbox-container" id="statusFilterContainer"></div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">ตำแหน่ง</label>
+                    <div class="checkbox-container" id="positionFilterContainer"></div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">สาขา</label>
+                    <div class="checkbox-container" id="branchFilterContainer"></div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="filter-reset-btn" onclick="resetFilters()">
+                        <i class="fa-solid fa-undo"></i> รีเซ็ต
+                    </button>
+                    <button class="filter-apply-btn" onclick="applyFiltersAndClose()">
+                        <i class="fa-solid fa-check"></i> ประมวลผล
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Status Modal -->
+        <div id="editModal" class="edit-modal">
+            <div class="edit-modal-content">
+                <div class="filter-modal-header">
+                    <div class="filter-modal-title">เปลี่ยนสถานะ</div>
+                    <span class="close-filter" onclick="closeEditModal()">&times;</span>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">สถานะใหม่</label>
+                    <select class="filter-select" id="editStatusSelect">
+                        <option value="ส่งใบสมัครแล้ว">ส่งใบสมัครแล้ว</option>
+                        <option value="ไม่ผ่านการคัดกรอง">ไม่ผ่านการคัดกรอง</option>
+                        <option value="ไม่สามารถติดต่อได้">ไม่สามารถติดต่อได้</option>
+                        <option value="นัดสัมภาษณ์">นัดสัมภาษณ์</option>
+                        <option value="สัมภาษณ์แล้วไม่ผ่าน">สัมภาษณ์แล้วไม่ผ่าน</option>
+                        <option value="สัมภาษณ์แล้วผ่าน">สัมภาษณ์แล้วผ่าน</option>
+                        <option value="รายงานตัวผ่านทดสอบ">รายงานตัวผ่านทดสอบ</option>
+                        <option value="นัดเริ่มงาน">นัดเริ่มงาน</option>
+                        <option value="สละสิทธิ์">สละสิทธิ์</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="filter-reset-btn" onclick="closeEditModal()">
+                        ยกเลิก
+                    </button>
+                    <button class="filter-apply-btn" id="saveStatusBtn" onclick="saveStatus()">
+                        <i class="fa-solid fa-save"></i> บันทึก
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="column-header">
+                    <div></div>
+                    <div>วันที่สมัคร</div>
+                    <div>ชื่อ-นามสกุล</div>
+                    <div>ตำแหน่ง</div>
+                    <div>สาขา</div>
+                    <div>เบอร์โทร</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>สถานะ</span>
+                    </div>
+                    <div>แก้ไขล่าสุดโดย</div>
+                    <div></div>
+                </div>
+                <div id="applicationsContainer">
+                    <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination-container">
+            <div class="pagination-info" id="pageInfo">หน้า 1 จาก 1</div>
+            <div class="pagination-controls">
+                <button class="pagination-btn" id="prevBtn" onclick="previousPage()">
+                    <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
+                </button>
+                <button class="pagination-btn" id="nextBtn" onclick="nextPage()">
+                    ถัดไป <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allApplications = [];
+        let filteredApplications = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentEditingId = null;
+        let userBranches = [];
+        let userInfo = null;
+
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzvqzExJJm12KrxqL7TZ8AOKrEKjNpaT2o_CtqsLvkw-iQ2FqmevaQsNkBJgr6vdlEc/exec';
+
+        const statusMap = {
+            'pending': '<span class="status-badge status-pending">ส่งใบสมัครแล้ว</span>',
+            'ส่งใบสมัครแล้ว': '<span class="status-badge status-pending">ส่งใบสมัครแล้ว</span>',
+            'ไม่ผ่านการคัดกรอง': '<span class="status-badge status-rejected">ไม่ผ่านการคัดกรอง</span>',
+            'ไม่สามารถติดต่อได้': '<span class="status-badge status-contacted">ไม่สามารถติดต่อได้</span>',
+            'นัดสัมภาษณ์': '<span class="status-badge status-interviewed">นัดสัมภาษณ์</span>',
+            'สัมภาษณ์แล้วไม่ผ่าน': '<span class="status-badge status-failed">สัมภาษณ์แล้วไม่ผ่าน</span>',
+            'สัมภาษณ์แล้วผ่าน': '<span class="status-badge status-passed">สัมภาษณ์แล้วผ่าน</span>',
+            'รายงานตัวผ่านทดสอบ': '<span class="status-badge status-report">รายงานตัวผ่านทดสอบ</span>',
+            'นัดเริ่มงาน': '<span class="status-badge status-submit">นัดเริ่มงาน</span>',
+            'สละสิทธิ์': '<span class="status-badge status-renounce">สละสิทธิ์</span>'
+        };
+
+        const statusOptions = [
+            'ส่งใบสมัครแล้ว',
+            'ไม่ผ่านการคัดกรอง',
+            'ไม่สามารถติดต่อได้',
+            'นัดสัมภาษณ์',
+            'สัมภาษณ์แล้วไม่ผ่าน',
+            'สัมภาษณ์แล้วผ่าน',
+            'รายงานตัวผ่านทดสอบ',
+            'นัดเริ่มงาน',
+            'สละสิทธิ์'
+        ];
+
+        function checkUserLogin() {
+            const userDataStr = sessionStorage.getItem('user');
+            if (!userDataStr) {
+                alert('กรุณา Login ก่อนเข้าใช้งาน');
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            try {
+                userInfo = JSON.parse(userDataStr);
+
+                const userProfile = document.getElementById('userProfile');
+                if (userProfile && userInfo.firstName && userInfo.lastName) {
+                    const initials = userInfo.firstName.charAt(0) + userInfo.lastName.charAt(0);
+                    userProfile.textContent = initials.toUpperCase();
+                    userProfile.title = `${userInfo.firstName} ${userInfo.lastName}`;
+                }
+
+                if (userInfo.branchInfo && Array.isArray(userInfo.branchInfo)) {
+                    userBranches = userInfo.branchInfo
+                        .filter(item => item.status === 'checked')
+                        .map(item => item.branch);
+
+                    console.log('User can access branches:', userBranches);
+
+                    if (userBranches.length === 0) {
+                        console.warn('User has no branch access');
+                    }
+                } else {
+                    console.warn('No branch info found for user');
+                    userBranches = [];
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                alert('เกิดข้อผิดพลาดในการอ่านข้อมูล User');
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
+
+        function filterByUserBranches(applications) {
+            if (!userBranches || userBranches.length === 0) {
+                console.log('No branch access, showing no data');
+                return [];
+            }
+
+            const filtered = applications.filter(app => {
+                return userBranches.includes(app.branch);
+            });
+
+            console.log(`Filtered from ${applications.length} to ${filtered.length} applications based on branch access`);
+            return filtered;
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('show');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.remove('show');
+        }
+
+        function openEditModal(id) {
+            currentEditingId = id;
+            const app = allApplications.find(a => a.id === id);
+            if (app) {
+                document.getElementById('editStatusSelect').value = app.status;
+                document.getElementById('editModal').classList.add('show');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentEditingId = null;
+        }
+
+        function saveStatus() {
+            if (currentEditingId) {
+                const newStatus = document.getElementById('editStatusSelect').value;
+                const appIndex = allApplications.findIndex(a => a.id === currentEditingId);
+                if (appIndex !== -1) {
+                    const app = allApplications[appIndex];
+
+                    const saveBtn = document.getElementById('saveStatusBtn');
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+                    saveBtn.disabled = true;
+
+                    const formData = new URLSearchParams();
+                    formData.append('timestamp', app.timestamp);
+                    formData.append('status', newStatus);
+                    formData.append('editedBy', userInfo.firstName);
+
+                    fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Update result:', result);
+
+                            allApplications[appIndex].status = newStatus;
+                            allApplications[appIndex].lastEditby = userInfo.firstName;
+
+                            const filteredIndex = filteredApplications.findIndex(a => a.id === currentEditingId);
+                            if (filteredIndex !== -1) {
+                                filteredApplications[filteredIndex].status = newStatus;
+                                filteredApplications[filteredIndex].lastEditby = userInfo.firstName;
+                            }
+
+                            renderApplications();
+                            closeEditModal();
+
+                            saveBtn.innerHTML = originalText;
+                            saveBtn.disabled = false;
+
+                        })
+                        .catch(error => {
+                            console.error('Error updating status:', error);
+
+                            saveBtn.innerHTML = originalText;
+                            saveBtn.disabled = false;
+
+                            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+                        });
+                }
+            }
+        }
+
+        function applyFiltersAndClose() {
+            applyFilters();
+            closeFilterModal();
+        }
+
+        function resetFilters() {
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            
+            document.querySelectorAll('#statusFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#positionFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#branchFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        window.onclick = function (event) {
+            const filterModal = document.getElementById('filterModal');
+            const editModal = document.getElementById('editModal');
+            if (event.target == filterModal) {
+                closeFilterModal();
+            }
+            if (event.target == editModal) {
+                closeEditModal();
+            }
+        }
+
+        function loadDataFromGoogleSheets() {
+            const container = document.getElementById('applicationsContainer');
+            container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดข้อมูลจาก Google Sheets...</div>';
+
+            fetch(GOOGLE_SHEETS_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received data from Google Sheets:', data);
+
+                    if (!data || data.length === 0) {
+                        container.innerHTML = '<div class="loading">ไม่พบข้อมูลใน Google Sheets</div>';
+                        return;
+                    }
+
+                    allApplications = data.map((item, index) => {
+                        const timestamp = item.timestamp || '-';
+                        const prefix = item.prefix || '-';
+                        const firstName = item.firstname || '-';
+                        const lastName = item.lastname || '-';
+                        const phone = item.phone || '-';
+                        const lineId = item.lineid || '-';
+                        const position = item.position || '-';
+                        const branch = item.branch || '-';
+                        const birthDate = item.birthdate || '-';
+                        const certificate = item.certificate || '-';
+                        const age = item.age || '-';
+                        const weight = item.weight || '-';
+                        const height = item.height || '-';
+                        const distance = item.distance || '-';
+                        const transportation = item.transportation || '-';
+                        const experience66 = item.experience66 || '-';
+                        const experience67 = item.experience67 || '-';
+                        const experience68 = item.experience68 || '-';
+                        const saleExperience = item.saleexperience || '-';
+                        const interviewDate = item.interviewdate || '-';
+                        const linePhone = item.linephone || '-';
+                        const startDate = item.startdate || '-';
+                        const faculty = item.faculty || '-';
+                        const oldSalary = item.oldsalary || '-';
+                        const healhty = item.healhty || '-';
+                        const skill = item.skill || '-';
+                        const drivingLicense = item.drivinglicense || '-';
+                        const workOutside = item.workoutsite || '-';
+                        const reason = item.reason || '-';
+                        const goal = item.goal || '-';
+                        const situation1 = item.situation1 || '-';
+                        const situation2 = item.situation2 || '-';
+                        const address = item.address || '-';
+                        const religion = item.religion || '-';
+                        const lastEditby = item.lasteditby || '';
+                        const status = item.status || 'ส่งใบสมัครแล้ว';
+
+                        let formattedDate = timestamp;
+                        let dateObj = null;
+                        try {
+                            if (timestamp && timestamp !== '-') {
+                                dateObj = new Date(timestamp);
+                                if (!isNaN(dateObj.getTime())) {
+                                    formattedDate = dateObj.toLocaleDateString('th-TH', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit'
+                                    });
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Error parsing date:', e);
+                        }
+
+                        return {
+                            id: index + 1,
+                            date: formattedDate,
+                            timestamp: timestamp,
+                            dateObj: dateObj,
+                            prefix: prefix,
+                            firstName: firstName,
+                            lastName: lastName,
+                            fullName: `${prefix} ${firstName} ${lastName}`.trim(),
+                            phone: phone,
+                            lineId: lineId,
+                            position: position,
+                            certificate: certificate,
+                            branch: branch,
+                            birthDate: birthDate,
+                            age: age,
+                            weight: weight,
+                            height: height,
+                            distance: distance,
+                            transportation: transportation,
+                            experience66: experience66,
+                            experience67: experience67,
+                            experience68: experience68,
+                            saleExperience: saleExperience,
+                            interviewDate: interviewDate,
+                            linePhone: linePhone,
+                            startDate: startDate,
+                            faculty: faculty,
+                            oldSalary: oldSalary,
+                            healhty: healhty,
+                            skill: skill,
+                            drivingLicense: drivingLicense,
+                            workOutside: workOutside,
+                            reason: reason,
+                            goal: goal,
+                            situation1: situation1,
+                            situation2: situation2,
+                            address: address,
+                            religion: religion,
+                            lastEditby: lastEditby,
+                            status: status || 'ส่งใบสมัครแล้ว'
+                        };
+                    });
+
+                    allApplications.sort((a, b) => {
+                        try {
+                            const dateA = new Date(a.timestamp || 0);
+                            const dateB = new Date(b.timestamp || 0);
+                            return dateB - dateA;
+                        } catch (e) {
+                            return 0;
+                        }
+                    });
+
+                    allApplications = filterByUserBranches(allApplications);
+
+                    filteredApplications = [...allApplications];
+                    currentPage = 1;
+                    populateFilters();
+                    renderApplications();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    container.innerHTML = `
+                        <div class="error-message">
+                            <i class="fa-solid fa-circle-exclamation"></i><br>
+                            เกิดข้อผิดพลาดในการโหลดข้อมูล<br>
+                            <small>${error.message}</small><br><br>
+                            <button class="refresh-btn" onclick="loadDataFromGoogleSheets()">
+                                <i class="fa-solid fa-rotate"></i> ลองอีกครั้ง
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        function populateFilters() {
+            // Status Filter
+            const statusContainer = document.getElementById('statusFilterContainer');
+            statusContainer.innerHTML = '';
+            statusOptions.forEach(status => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="status-${status}" value="${status}">
+                    <label for="status-${status}">${status}</label>
+                `;
+                statusContainer.appendChild(div);
+            });
+
+            // Position Filter
+            const positions = [...new Set(allApplications.map(app => app.position).filter(p => p !== '-'))];
+            const positionContainer = document.getElementById('positionFilterContainer');
+            positionContainer.innerHTML = '';
+            positions.forEach(pos => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="position-${pos}" value="${pos}">
+                    <label for="position-${pos}">${pos}</label>
+                `;
+                positionContainer.appendChild(div);
+            });
+
+            // Branch Filter
+            const branches = [...new Set(allApplications.map(app => app.branch).filter(b => b !== '-'))];
+            const branchContainer = document.getElementById('branchFilterContainer');
+            branchContainer.innerHTML = '';
+            branches.forEach(branch => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="branch-${branch}" value="${branch}">
+                    <label for="branch-${branch}">${branch}</label>
+                `;
+                branchContainer.appendChild(div);
+            });
+        }
+
+        function applyFilters() {
+            const dateFrom = document.getElementById('dateFromFilter').value;
+            const dateTo = document.getElementById('dateToFilter').value;
+            
+            const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
+            const selectedPositions = Array.from(document.querySelectorAll('#positionFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
+            const selectedBranches = Array.from(document.querySelectorAll('#branchFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
+
+            filteredApplications = allApplications.filter(app => {
+                let dateMatch = true;
+                if (dateFrom && app.dateObj) {
+                    const fromDate = new Date(dateFrom);
+                    dateMatch = dateMatch && app.dateObj >= fromDate;
+                }
+                if (dateTo && app.dateObj) {
+                    const toDate = new Date(dateTo);
+                    toDate.setHours(23, 59, 59, 999);
+                    dateMatch = dateMatch && app.dateObj <= toDate;
+                }
+
+                const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(app.status);
+                const positionMatch = selectedPositions.length === 0 || selectedPositions.includes(app.position);
+                const branchMatch = selectedBranches.length === 0 || selectedBranches.includes(app.branch);
+
+                return dateMatch && statusMatch && positionMatch && branchMatch;
+            });
+
+            currentPage = 1;
+            renderApplications();
+        }
+
+        function openDetailPage(id) {
+            const app = allApplications.find(a => a.id === id);
+            if (!app) return;
+
+            const detailWindow = window.open('', '_blank');
+            detailWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="th">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>รายละเอียดผู้สมัคร - ${app.fullName}</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            min-height: 100vh;
+                            padding: 20px;
+                        }
+                        .container {
+                            max-width: 1000px;
+                            margin: 0 auto;
+                            background: white;
+                            border-radius: 20px;
+                            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                            overflow: hidden;
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #667eea, #764ba2);
+                            color: white;
+                            padding: 30px;
+                            text-align: center;
+                        }
+                        .header h1 {
+                            font-size: 28px;
+                            margin-bottom: 10px;
+                        }
+                        .header p {
+                            font-size: 16px;
+                            opacity: 0.9;
+                        }
+                        .content {
+                            padding: 40px;
+                        }
+                        .section {
+                            margin-bottom: 30px;
+                        }
+                        .section-title {
+                            font-size: 20px;
+                            font-weight: bold;
+                            color: #667eea;
+                            margin-bottom: 15px;
+                            padding-bottom: 10px;
+                            border-bottom: 2px solid #667eea;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                            gap: 20px;
+                        }
+                        .info-item {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 5px;
+                        }
+                        .info-label {
+                            font-size: 13px;
+                            color: #6b7280;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .info-value {
+                            font-size: 16px;
+                            color: #1f2937;
+                            font-weight: 500;
+                            padding: 12px;
+                            background: #f9fafb;
+                            border-radius: 8px;
+                            border-left: 4px solid #667eea;
+                        }
+                        .status-badge {
+                            display: inline-block;
+                            padding: 8px 16px;
+                            border-radius: 12px;
+                            font-size: 14px;
+                            font-weight: 600;
+                        }
+                        .status-pending { background: #fef3c7; color: #92400e; }
+                        .status-rejected { background: #fee2e2; color: #991b1b; }
+                        .status-interviewed { background: #dbeafe; color: #1e40af; }
+                        .status-passed { background: #c7d2fe; color: #3730a3; }
+                        .status-failed { background: #fed7aa; color: #92400e; }
+                        .status-contacted { background: #d1d5db; color: #374151; }
+                        .status-report { background: #f3e8ff; color: #581c87; }
+                        .status-renounce { background: #e0e7ff; color: #3f0f5c; }
+                        .status-submit { background: #cffafe; color: #164e63; }
+                        @media print {
+                            body { background: white; padding: 0; }
+                        }
+                        @media (max-width: 768px) {
+                            body { padding: 10px; }
+                            .container { border-radius: 15px; }
+                            .header { padding: 20px 15px; }
+                            .header h1 { font-size: 20px; }
+                            .header p { font-size: 14px; }
+                            .content { padding: 20px 15px; }
+                            .section { margin-bottom: 25px; }
+                            .section-title { font-size: 18px; }
+                            .info-grid { 
+                                grid-template-columns: 1fr; 
+                                gap: 15px; 
+                            }
+                            .info-label { font-size: 12px; }
+                            .info-value { 
+                                font-size: 14px; 
+                                padding: 10px;
+                            }
+                            .status-badge {
+                                padding: 6px 12px;
+                                font-size: 12px;
+                            }
+                        }
+                        @media (max-width: 480px) {
+                            body { padding: 5px; }
+                            .container { border-radius: 10px; }
+                            .header { padding: 15px 10px; }
+                            .header h1 { font-size: 18px; }
+                            .header h1 i { font-size: 16px; }
+                            .content { padding: 15px 10px; }
+                            .section { margin-bottom: 20px; }
+                            .section-title { 
+                                font-size: 16px; 
+                                padding-bottom: 8px;
+                            }
+                            .section-title i { font-size: 14px; }
+                            .info-grid { 
+                                grid-template-columns: repeat(2, 1fr);
+                                gap: 12px; 
+                            }
+                            .info-label { font-size: 10px; }
+                            .info-value { 
+                                font-size: 12px; 
+                                padding: 8px;
+                                border-left-width: 3px;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1><i class="fa-solid fa-user-circle"></i> รายละเอียดผู้สมัครงาน</h1>
+                        </div>
+                        <div class="content">
+                            <div class="section">
+                                <div class="section-title">
+                                    <i class="fa-solid fa-id-card"></i> ข้อมูลส่วนตัว
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">ชื่อ-นามสกุล</div>
+                                        <div class="info-value">${app.fullName}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">เบอร์โทร</div>
+                                        <div class="info-value">${app.phone}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วุฒิการศึกษา</div>
+                                        <div class="info-value">${app.certificate}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">สาขา</div>
+                                        <div class="info-value">${app.faculty}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Line Phone</div>
+                                        <div class="info-value">${app.linePhone}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">Line ID</div>
+                                        <div class="info-value">${app.lineId}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วันเกิด</div>
+                                        <div class="info-value">${app.birthDate}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">อายุ</div>
+                                        <div class="info-value">${app.age}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">น้ำหนัก</div>
+                                        <div class="info-value">${app.weight}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ความสูง</div>
+                                        <div class="info-value">${app.height}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ศาสนา</div>
+                                        <div class="info-value">${app.religion}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">สุขภาพ ประวัติอาชญากรรม</div>
+                                        <div class="info-value">${app.healhty}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ทักษะ ความสามารถ</div>
+                                        <div class="info-value">${app.skill}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-title">
+                                    <i class="fa-solid fa-briefcase"></i> ข้อมูลการสมัครงาน
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">ตำแหน่ง</div>
+                                        <div class="info-value">${app.position}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">สาขา</div>
+                                        <div class="info-value">${app.branch}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วันที่สมัครงาน</div>
+                                        <div class="info-value">${app.date}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">สถานะ</div>
+                                        <div class="info-value">
+                                            ${statusMap[app.status] || statusMap['pending']}
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วันที่นัดสัมภาษณ์</div>
+                                        <div class="info-value">${app.interviewDate}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วันที่พร้อมเริ่มงาน</div>
+                                        <div class="info-value">${app.startDate}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-title">
+                                    <i class="fa-solid fa-location-dot"></i> ข้อมูลการเดินทาง
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">ที่พักอาศัย</div>
+                                        <div class="info-value">${app.address}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ระยะทาง (KM)</div>
+                                        <div class="info-value">${app.distance}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ใบขับขี่</div>
+                                        <div class="info-value">${app.drivingLicense}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">วิธีเดินทาง</div>
+                                        <div class="info-value">${app.transportation}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <div class="section-title">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> ประสบการณ์
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">ประสบการณ์ปี 2566</div>
+                                        <div class="info-value">${app.experience66}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ประสบการณ์ปี 2567</div>
+                                        <div class="info-value">${app.experience67}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ประสบการณ์ปี 2568</div>
+                                        <div class="info-value">${app.experience68}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ประสบการณ์ด้านการขาย</div>
+                                        <div class="info-value">${app.saleExperience}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-title">
+                                    <i class="fa-solid fa-folder"></i> อื่นๆ
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">สาเหตุที่ลาออกจากงาน</div>
+                                        <div class="info-value">${app.reason}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">สามารถเดินทางไปทำงานต่างจังหวัดได้หรือไม่</div>
+                                        <div class="info-value">${app.workOutside}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ถ้าต้องทำงานกับคนที่คุณไม่ชอบ</div>
+                                        <div class="info-value">${app.situation1}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ถ้าคุณเห็นบุคคลใดทุจริตในบริษัท</div>
+                                        <div class="info-value">${app.situation2}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">ความสำเร็จที่ภูมิใจมากที่สุด</div>
+                                        <div class="info-value">${app.goal}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            detailWindow.document.close();
+        }
+
+        function renderApplications() {
+            const container = document.getElementById('applicationsContainer');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageApplications = filteredApplications.slice(startIndex, endIndex);
+
+            if (pageApplications.length === 0) {
+                container.innerHTML = '<div class="loading">ไม่พบข้อมูล</div>';
+                updatePaginationInfo();
+                return;
+            }
+
+            let html = '';
+            pageApplications.forEach((app, idx) => {
+                const rowId = `row-${app.id}`;
+                html += `
+                    <div class="table-row">
+                        <div class="row-header">
+                            <button class="expand-btn" id="btn-${rowId}" onclick="toggleRow(event, '${rowId}')">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                            <div class="cell">${app.date}</div>
+                            <div class="cell">${app.fullName}</div>
+                            <div class="cell">${app.position}</div>
+                            <div class="cell">${app.branch}</div>
+                            <div class="cell">${app.phone}</div>
+                            <div class="cell">${statusMap[app.status] || statusMap['pending']}</div>
+                            <div class="cell">${app.lastEditby}</div>
+                            <button class="edit-icon" onclick="openEditModal(${app.id})" title="แก้ไขสถานะ">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </div>
+                        <div class="collapsed-content" id="${rowId}">
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">วุฒิการศึกษา</div>
+                                    <div class="detail-value">${app.certificate}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">สาขา</div>
+                                    <div class="detail-value">${app.faculty}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">อายุ</div>
+                                    <div class="detail-value">${app.age}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">น้ำหนัก</div>
+                                    <div class="detail-value">${app.weight}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ความสูง</div>
+                                    <div class="detail-value">${app.height}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ระยะทาง (KM)</div>
+                                    <div class="detail-value">${app.distance}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">วิธีเดินทาง</div>
+                                    <div class="detail-value">${app.transportation}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ใบขับขี่</div>
+                                    <div class="detail-value">${app.drivingLicense}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ประสบการณ์ปี 2566</div>
+                                    <div class="detail-value">${app.experience66}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ประสบการณ์ปี 2567</div>
+                                    <div class="detail-value">${app.experience67}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ประสบการณ์ปี 2568</div>
+                                    <div class="detail-value">${app.experience68}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">ประสบการณ์ด้านการขาย</div>
+                                    <div class="detail-value">${app.saleExperience}</div>
+                                </div>
+                            </div>
+                            <div class="detail-more-btn-container">
+                                <button class="detail-more-btn" onclick="openDetailPage(${app.id})">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    ดูรายละเอียดเพิ่มเติม
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updatePaginationInfo();
+        }
+
+        function toggleRow(event, rowId) {
+            event.stopPropagation();
+            const content = document.getElementById(rowId);
+            const btn = document.getElementById(`btn-${rowId}`);
+
+            content.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+
+        function updatePaginationInfo() {
+            const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
+            document.getElementById('pageInfo').textContent = `หน้า ${currentPage} จาก ${totalPages || 1}`;
+
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages || totalPages === 0;
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderApplications();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderApplications();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (checkUserLogin()) {
+                loadDataFromGoogleSheets();
+            }
+        });
+    </script>
+</body>
+
+</html>
