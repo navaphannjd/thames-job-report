@@ -122,23 +122,23 @@
             transform: translateY(-2px);
         }
 
-        .refresh-btn {
+        .settings-btn {
             padding: 8px 16px;
             border: none;
             border-radius: 8px;
-            background: #10b981;
+            background: #ad6eec;
             color: white;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .refresh-btn:hover {
-            background: #059669;
+        .settings-btn:hover {
+            background: #764ba2;
             transform: translateY(-2px);
         }
 
@@ -753,6 +753,11 @@
                 font-size: 18px;
             }
 
+            .settings-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
             .edit-modal-content {
                 padding: 20px;
                 width: 95%;
@@ -915,6 +920,16 @@
                 font-size: 12px;
                 padding: 8px 12px;
             }
+
+            .settings-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                gap: 4px;
+            }
+
+            .settings-btn i {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -956,6 +971,9 @@
             <div class="filter-controls">
                 <button class="filter-btn" onclick="openFilterModal()">
                     <i class="fa-solid fa-filter"></i> ตัวกรอง
+                </button>
+                <button class="settings-btn" id="settingsBtn" onclick="goToSettings()" style="display: none;">
+                    <i class="fa-solid fa-gear"></i> ตั้งค่า
                 </button>
             </div>
         </div>
@@ -1127,10 +1145,18 @@
                     userProfile.title = `${userInfo.firstName} ${userInfo.lastName}`;
                 }
 
-                // Update profile menu name - เพิ่มส่วนนี้ใหม่
+                // Update profile menu name
                 const profileMenuName = document.querySelector('.profile-menu-name');
                 if (profileMenuName && userInfo.firstName && userInfo.lastName) {
                     profileMenuName.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
+                }
+
+                // Show settings button if user is Admin
+                if (userInfo.role === 'Admin') {
+                    const settingsBtn = document.getElementById('settingsBtn');
+                    if (settingsBtn) {
+                        settingsBtn.style.display = 'flex';
+                    }
                 }
 
                 if (userInfo.branchInfo && Array.isArray(userInfo.branchInfo)) {
@@ -1989,6 +2015,11 @@
                 renderApplications();
             }
         }
+
+        function goToSettings() {
+    // นำทางไปหน้าตั้งค่า (ปรับ URL ตามจริง)
+    window.location.href = 'settings.html';
+}
 
         function toggleProfileMenu() {
             const profileMenu = document.getElementById('profileMenu');

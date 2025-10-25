@@ -379,6 +379,7 @@
                 sessionStorage.setItem('user', JSON.stringify({
                     firstName: result.firstName,
                     lastName: result.lastName,
+                    role: result.role,
                     branchInfo: result.branchInfo
                 }));
                 
@@ -408,7 +409,7 @@
 
             showLoading();
 
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbzn2ES26zUSaypk7BHGkHZ58K7R_ybfQcaOEt-3rKO0rF5zF_SkKwKLzHRW_iorrGDBzA/exec';
+            var scriptURL = 'https://script.google.com/macros/s/AKfycbzSgAoFMFu2-AB_mrY_1YEw9LMNuMFMZgXB_Vm3qMXPDRLgUEC4R9HzHtApiJpTU2leEA/exec';
             
             console.log('Attempting login for:', userName);
             
