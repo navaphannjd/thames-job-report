@@ -273,7 +273,8 @@
             border-top: 1px solid #eee;
         }
 
-        .filter-reset-btn, .filter-apply-btn {
+        .filter-reset-btn,
+        .filter-apply-btn {
             flex: 1;
             padding: 10px 16px;
             border: none;
@@ -613,6 +614,90 @@
             font-weight: 600;
         }
 
+        .profile-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 220px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 101;
+            overflow: hidden;
+        }
+
+        .profile-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-menu-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-menu-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .profile-menu-email {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .profile-menu-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-menu-item i {
+            width: 20px;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .profile-menu-item:hover {
+            background: #f8f9ff;
+            padding-left: 25px;
+        }
+
+        .profile-menu-item.logout {
+            color: #ff4444;
+            border-bottom: none;
+        }
+
+        .profile-menu-item.logout i {
+            color: #ff4444;
+        }
+
+        .profile-menu-item.logout:hover {
+            background: #fff5f5;
+        }
+
+        .user-profile {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            transform: scale(1.05);
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .header {
@@ -650,10 +735,11 @@
 
             .filter-controls {
                 width: 100%;
-                justify-content: flex-start;
+                justify-content: flex-end;
             }
 
-            .filter-btn, .refresh-btn {
+            .filter-btn,
+            .refresh-btn {
                 padding: 8px 12px;
                 font-size: 12px;
             }
@@ -714,7 +800,7 @@
             }
 
             .detail-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
             }
 
@@ -773,13 +859,15 @@
                 font-size: 18px;
             }
 
-            .filter-btn, .refresh-btn {
+            .filter-btn,
+            .refresh-btn {
                 padding: 6px 10px;
                 font-size: 11px;
                 gap: 4px;
             }
 
-            .filter-btn i, .refresh-btn i {
+            .filter-btn i,
+            .refresh-btn i {
                 font-size: 11px;
             }
 
@@ -803,7 +891,7 @@
             }
 
             .detail-grid {
-                grid-template-columns: repeat(2, 0.3fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
 
@@ -841,7 +929,25 @@
             </div>
             <div class="page-title-header">Job Applications</div>
         </div>
-        <div class="user-profile" id="userProfile">JD</div>
+        <div class="user-profile" onclick="toggleProfileMenu()">JD</div>
+    </div>
+
+    <div class="profile-menu" id="profileMenu">
+        <div class="profile-menu-header">
+            <div class="profile-menu-name">John Doe</div>
+        </div>
+        <div class="profile-menu-item" onclick="goToProfile()">
+            <i class="fa-solid fa-user"></i>
+            <span>My Profile</span>
+        </div>
+        <div class="profile-menu-item" onclick="goToSettings()">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </div>
+        <div class="profile-menu-item logout" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Out</span>
+        </div>
     </div>
 
     <div class="content">
@@ -850,9 +956,6 @@
             <div class="filter-controls">
                 <button class="filter-btn" onclick="openFilterModal()">
                     <i class="fa-solid fa-filter"></i> ตัวกรอง
-                </button>
-                <button class="refresh-btn" onclick="loadDataFromGoogleSheets()">
-                    <i class="fa-solid fa-rotate"></i> รีเฟรช
                 </button>
             </div>
         </div>
@@ -1016,11 +1119,18 @@
             try {
                 userInfo = JSON.parse(userDataStr);
 
-                const userProfile = document.getElementById('userProfile');
+                // Update user profile icon
+                const userProfile = document.querySelector('.user-profile');
                 if (userProfile && userInfo.firstName && userInfo.lastName) {
                     const initials = userInfo.firstName.charAt(0) + userInfo.lastName.charAt(0);
                     userProfile.textContent = initials.toUpperCase();
                     userProfile.title = `${userInfo.firstName} ${userInfo.lastName}`;
+                }
+
+                // Update profile menu name - เพิ่มส่วนนี้ใหม่
+                const profileMenuName = document.querySelector('.profile-menu-name');
+                if (profileMenuName && userInfo.firstName && userInfo.lastName) {
+                    profileMenuName.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
                 }
 
                 if (userInfo.branchInfo && Array.isArray(userInfo.branchInfo)) {
@@ -1141,10 +1251,37 @@
             closeFilterModal();
         }
 
+        function setDefaultDateFilters() {
+            const today = new Date();
+            const fifteenDaysAgo = new Date();
+            fifteenDaysAgo.setDate(today.getDate() - 15);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('dateFromFilter').value = formatDate(fifteenDaysAgo);
+            document.getElementById('dateToFilter').value = formatDate(today);
+        }
+
         function resetFilters() {
-            document.getElementById('dateFromFilter').value = '';
-            document.getElementById('dateToFilter').value = '';
-            
+            const today = new Date();
+            const fifteenDaysAgo = new Date();
+            fifteenDaysAgo.setDate(today.getDate() - 15);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('dateFromFilter').value = formatDate(fifteenDaysAgo);
+            document.getElementById('dateToFilter').value = formatDate(today);
+
             document.querySelectorAll('#statusFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('#positionFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('#branchFilterContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -1292,20 +1429,21 @@
                     filteredApplications = [...allApplications];
                     currentPage = 1;
                     populateFilters();
-                    renderApplications();
+                    setDefaultDateFilters(); // เพิ่มบรรทัดนี้
+                    applyFilters(); // แก้จาก renderApplications() เป็น applyFilters()
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     container.innerHTML = `
-                        <div class="error-message">
-                            <i class="fa-solid fa-circle-exclamation"></i><br>
-                            เกิดข้อผิดพลาดในการโหลดข้อมูล<br>
-                            <small>${error.message}</small><br><br>
-                            <button class="refresh-btn" onclick="loadDataFromGoogleSheets()">
-                                <i class="fa-solid fa-rotate"></i> ลองอีกครั้ง
-                            </button>
-                        </div>
-                    `;
+                <div class="error-message">
+                    <i class="fa-solid fa-circle-exclamation"></i><br>
+                    เกิดข้อผิดพลาดในการโหลดข้อมูล<br>
+                    <small>${error.message}</small><br><br>
+                    <button class="refresh-btn" onclick="loadDataFromGoogleSheets()">
+                        <i class="fa-solid fa-rotate"></i> ลองอีกครั้ง
+                    </button>
+                </div>
+            `;
                 });
         }
 
@@ -1355,7 +1493,7 @@
         function applyFilters() {
             const dateFrom = document.getElementById('dateFromFilter').value;
             const dateTo = document.getElementById('dateToFilter').value;
-            
+
             const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
             const selectedPositions = Array.from(document.querySelectorAll('#positionFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
             const selectedBranches = Array.from(document.querySelectorAll('#branchFilterContainer input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -1757,16 +1895,16 @@
                         <div class="collapsed-content" id="${rowId}">
                             <div class="detail-grid">
                                 <div class="detail-item">
+                                    <div class="detail-label">อายุ</div>
+                                    <div class="detail-value">${app.age}</div>
+                                </div>
+                                <div class="detail-item">
                                     <div class="detail-label">วุฒิการศึกษา</div>
                                     <div class="detail-value">${app.certificate}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">สาขา</div>
                                     <div class="detail-value">${app.faculty}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">อายุ</div>
-                                    <div class="detail-value">${app.age}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">น้ำหนัก</div>
@@ -1789,6 +1927,10 @@
                                     <div class="detail-value">${app.drivingLicense}</div>
                                 </div>
                                 <div class="detail-item">
+                                    <div class="detail-label">ประสบการณ์ด้านการขาย</div>
+                                    <div class="detail-value">${app.saleExperience}</div>
+                                </div>
+                                <div class="detail-item">
                                     <div class="detail-label">ประสบการณ์ปี 2566</div>
                                     <div class="detail-value">${app.experience66}</div>
                                 </div>
@@ -1799,10 +1941,6 @@
                                 <div class="detail-item">
                                     <div class="detail-label">ประสบการณ์ปี 2568</div>
                                     <div class="detail-value">${app.experience68}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">ประสบการณ์ด้านการขาย</div>
-                                    <div class="detail-value">${app.saleExperience}</div>
                                 </div>
                             </div>
                             <div class="detail-more-btn-container">
@@ -1852,9 +1990,33 @@
             }
         }
 
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profileMenu');
+            profileMenu.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                // Clear session storage
+                sessionStorage.removeItem('user');
+
+                // Redirect to login page
+                window.location.href = 'index.html';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             if (checkUserLogin()) {
                 loadDataFromGoogleSheets();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            const profileMenu = document.getElementById('profileMenu');
+            const userProfile = document.querySelector('.user-profile');
+
+            if (!profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
+                profileMenu.classList.remove('active');
             }
         });
     </script>
