@@ -350,7 +350,7 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             display: grid;
-            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 0.8fr 1fr 60px;
+            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 1.3fr 2fr 60px;
             gap: 12px;
             font-size: 13px;
             align-items: center;
@@ -388,7 +388,7 @@
         .row-header {
             padding: 15px 20px;
             display: grid;
-            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 1fr 1fr 60px;
+            grid-template-columns: 50px 1fr 1.2fr 1fr 1.5fr 1.2fr 1.3fr 2fr 60px;
             gap: 12px;
             align-items: center;
             transition: background 0.3s ease;
@@ -1142,7 +1142,7 @@
         let userInfo = null;
         let branchSortOrder = 'none'; // 'none', 'asc', 'desc'
 
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzvqzExJJm12KrxqL7TZ8AOKrEKjNpaT2o_CtqsLvkw-iQ2FqmevaQsNkBJgr6vdlEc/exec';
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycby2TsBnT-QDBJeMNdaHkwjq4KW3VNkbTqpq_-gDJUYHyTOTxALtN_xs9MioIfDnccUH/exec';
 
         const statusMap = {
             'pending': '<span class="status-badge status-pending">ส่งใบสมัครแล้ว</span>',
@@ -1172,7 +1172,7 @@
         function toggleBranchSort() {
             const header = document.getElementById('branchSortHeader');
             const icon = document.getElementById('sortIcon');
-            
+
             // Cycle through: none -> asc -> desc -> none
             if (branchSortOrder === 'none') {
                 branchSortOrder = 'asc';
@@ -1186,7 +1186,7 @@
                 icon.className = 'fa-solid fa-sort sort-icon';
                 header.classList.remove('active');
             }
-            
+
             applySorting();
         }
 
@@ -1206,7 +1206,7 @@
                 filteredApplications.sort((a, b) => {
                     // First, sort by branch alphabetically
                     const branchCompare = a.branch.localeCompare(b.branch, 'th');
-                    
+
                     if (branchCompare !== 0) {
                         // If branches are different, sort by branch order
                         return branchSortOrder === 'asc' ? branchCompare : -branchCompare;
@@ -1222,7 +1222,7 @@
                     }
                 });
             }
-            
+
             currentPage = 1;
             renderApplications();
         }
@@ -1318,57 +1318,71 @@
         }
 
         function saveStatus() {
-            if (currentEditingId) {
-                const newStatus = document.getElementById('editStatusSelect').value;
-                const appIndex = allApplications.findIndex(a => a.id === currentEditingId);
-                if (appIndex !== -1) {
-                    const app = allApplications[appIndex];
+    if (currentEditingId) {
+        const newStatus = document.getElementById('editStatusSelect').value;
+        const appIndex = allApplications.findIndex(a => a.id === currentEditingId);
+        if (appIndex !== -1) {
+            const app = allApplications[appIndex];
 
-                    const saveBtn = document.getElementById('saveStatusBtn');
-                    const originalText = saveBtn.innerHTML;
-                    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
-                    saveBtn.disabled = true;
+            const saveBtn = document.getElementById('saveStatusBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+            saveBtn.disabled = true;
 
-                    const formData = new URLSearchParams();
-                    formData.append('timestamp', app.timestamp);
-                    formData.append('status', newStatus);
-                    formData.append('editedBy', userInfo.firstName);
+            const formData = new URLSearchParams();
+            formData.append('timestamp', app.timestamp);
+            formData.append('status', newStatus);
+            formData.append('editedBy', userInfo.firstName);
 
-                    fetch(GOOGLE_SHEETS_URL, {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Update result:', result);
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Update result:', result);
 
-                            allApplications[appIndex].status = newStatus;
-                            allApplications[appIndex].lastEditby = userInfo.firstName;
+                    // **เพิ่ม: สร้างข้อความแก้ไขล่าสุดพร้อมวันที่-เวลา**
+                    const editInfo = result.editedDateTime 
+                        ? `${userInfo.firstName} (${result.editedDateTime})`
+                        : userInfo.firstName;
 
-                            const filteredIndex = filteredApplications.findIndex(a => a.id === currentEditingId);
-                            if (filteredIndex !== -1) {
-                                filteredApplications[filteredIndex].status = newStatus;
-                                filteredApplications[filteredIndex].lastEditby = userInfo.firstName;
-                            }
+                    // อัปเดตข้อมูลใน allApplications
+                    allApplications[appIndex].status = newStatus;
+                    allApplications[appIndex].lastEditby = editInfo;
 
-                            renderApplications();
-                            closeEditModal();
+                    // อัปเดตข้อมูลใน filteredApplications
+                    const filteredIndex = filteredApplications.findIndex(a => a.id === currentEditingId);
+                    if (filteredIndex !== -1) {
+                        filteredApplications[filteredIndex].status = newStatus;
+                        filteredApplications[filteredIndex].lastEditby = editInfo;
+                    }
 
-                            saveBtn.innerHTML = originalText;
-                            saveBtn.disabled = false;
+                    // **เพิ่ม: อัปเดตข้อมูลใน allApplicationsRaw ด้วย**
+                    const rawIndex = allApplicationsRaw.findIndex(a => a.id === currentEditingId);
+                    if (rawIndex !== -1) {
+                        allApplicationsRaw[rawIndex].status = newStatus;
+                        allApplicationsRaw[rawIndex].lastEditby = editInfo;
+                    }
 
-                        })
-                        .catch(error => {
-                            console.error('Error updating status:', error);
+                    renderApplications();
+                    closeEditModal();
 
-                            saveBtn.innerHTML = originalText;
-                            saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
 
-                            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
-                        });
-                }
-            }
+                })
+                .catch(error => {
+                    console.error('Error updating status:', error);
+
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+
+                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+                });
         }
+    }
+}
 
         function applyFiltersAndClose() {
             applyFilters();
@@ -1647,113 +1661,164 @@
         }
 
         function openDetailPage(id) {
-            const app = allApplications.find(a => a.id === id);
-            if (!app) return;
+    const app = allApplications.find(a => a.id === id);
+    if (!app) return;
 
-            const detailWindow = window.open('', '_blank');
-            detailWindow.document.write(`
-                <!DOCTYPE html>
-                <html lang="th">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>รายละเอียดผู้สมัคร - ${app.fullName}</title>
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; padding: 20px; }
-                        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); overflow: hidden; }
-                        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; }
-                        .header h1 { font-size: 28px; margin-bottom: 10px; }
-                        .content { padding: 40px; }
-                        .section { margin-bottom: 30px; }
-                        .section-title { font-size: 20px; font-weight: bold; color: #667eea; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #667eea; display: flex; align-items: center; gap: 10px; }
-                        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-                        .info-item { display: flex; flex-direction: column; gap: 5px; }
-                        .info-label { font-size: 13px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-                        .info-value { font-size: 16px; color: #1f2937; font-weight: 500; padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea; }
-                        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; }
-                        .status-pending { background: #fef3c7; color: #92400e; }
-                        .status-rejected { background: #fee2e2; color: #991b1b; }
-                        .status-interviewed { background: #dbeafe; color: #1e40af; }
-                        .status-passed { background: #c7d2fe; color: #3730a3; }
-                        .status-failed { background: #fed7aa; color: #92400e; }
-                        .status-contacted { background: #d1d5db; color: #374151; }
-                        .status-report { background: #f3e8ff; color: #581c87; }
-                        .status-renounce { background: #e0e7ff; color: #3f0f5c; }
-                        .status-submit { background: #cffafe; color: #164e63; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1><i class="fa-solid fa-user-circle"></i> รายละเอียดผู้สมัครงาน</h1>
-                        </div>
-                        <div class="content">
-                            <div class="section">
-                                <div class="section-title"><i class="fa-solid fa-id-card"></i> ข้อมูลส่วนตัว</div>
-                                <div class="info-grid">
-                                    <div class="info-item"><div class="info-label">ชื่อ-นามสกุล</div><div class="info-value">${app.fullName}</div></div>
-                                    <div class="info-item"><div class="info-label">เบอร์โทร</div><div class="info-value">${app.phone}</div></div>
-                                    <div class="info-item"><div class="info-label">วุฒิการศึกษา</div><div class="info-value">${app.certificate}</div></div>
-                                    <div class="info-item"><div class="info-label">สาขา</div><div class="info-value">${app.faculty}</div></div>
-                                    <div class="info-item"><div class="info-label">Line Phone</div><div class="info-value">${app.linePhone}</div></div>
-                                    <div class="info-item"><div class="info-label">Line ID</div><div class="info-value">${app.lineId}</div></div>
-                                    <div class="info-item"><div class="info-label">วันเกิด</div><div class="info-value">${app.birthDate}</div></div>
-                                    <div class="info-item"><div class="info-label">อายุ</div><div class="info-value">${app.age}</div></div>
-                                    <div class="info-item"><div class="info-label">น้ำหนัก</div><div class="info-value">${app.weight}</div></div>
-                                    <div class="info-item"><div class="info-label">ความสูง</div><div class="info-value">${app.height}</div></div>
-                                    <div class="info-item"><div class="info-label">ศาสนา</div><div class="info-value">${app.religion}</div></div>
-                                    <div class="info-item"><div class="info-label">สุขภาพ ประวัติอาชญากรรม</div><div class="info-value">${app.healhty}</div></div>
-                                    <div class="info-item"><div class="info-label">ทักษะ ความสามารถ</div><div class="info-value">${app.skill}</div></div>
-                                </div>
-                            </div>
-                            <div class="section">
-                                <div class="section-title"><i class="fa-solid fa-briefcase"></i> ข้อมูลการสมัครงาน</div>
-                                <div class="info-grid">
-                                    <div class="info-item"><div class="info-label">ตำแหน่ง</div><div class="info-value">${app.position}</div></div>
-                                    <div class="info-item"><div class="info-label">สาขา</div><div class="info-value">${app.branch}</div></div>
-                                    <div class="info-item"><div class="info-label">วันที่สมัครงาน</div><div class="info-value">${app.date}</div></div>
-                                    <div class="info-item"><div class="info-label">สถานะ</div><div class="info-value">${statusMap[app.status] || statusMap['pending']}</div></div>
-                                    <div class="info-item"><div class="info-label">วันที่นัดสัมภาษณ์</div><div class="info-value">${app.interviewDate}</div></div>
-                                    <div class="info-item"><div class="info-label">วันที่พร้อมเริ่มงาน</div><div class="info-value">${app.startDate}</div></div>
-                                </div>
-                            </div>
-                            <div class="section">
-                                <div class="section-title"><i class="fa-solid fa-location-dot"></i> ข้อมูลการเดินทาง</div>
-                                <div class="info-grid">
-                                    <div class="info-item"><div class="info-label">ที่พักอาศัย</div><div class="info-value">${app.address}</div></div>
-                                    <div class="info-item"><div class="info-label">ระยะทาง (KM)</div><div class="info-value">${app.distance}</div></div>
-                                    <div class="info-item"><div class="info-label">ใบขับขี่</div><div class="info-value">${app.drivingLicense}</div></div>
-                                    <div class="info-item"><div class="info-label">วิธีเดินทาง</div><div class="info-value">${app.transportation}</div></div>
-                                </div>
-                            </div>
-                            <div class="section">
-                                <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> ประสบการณ์</div>
-                                <div class="info-grid">
-                                    <div class="info-item"><div class="info-label">ประสบการณ์ปี 2566</div><div class="info-value">${app.experience66}</div></div>
-                                    <div class="info-item"><div class="info-label">ประสบการณ์ปี 2567</div><div class="info-value">${app.experience67}</div></div>
-                                    <div class="info-item"><div class="info-label">ประสบการณ์ปี 2568</div><div class="info-value">${app.experience68}</div></div>
-                                    <div class="info-item"><div class="info-label">ประสบการณ์ด้านการขาย</div><div class="info-value">${app.saleExperience}</div></div>
-                                </div>
-                            </div>
-                            <div class="section">
-                                <div class="section-title"><i class="fa-solid fa-folder"></i> อื่นๆ</div>
-                                <div class="info-grid">
-                                    <div class="info-item"><div class="info-label">สาเหตุที่ลาออกจากงาน</div><div class="info-value">${app.reason}</div></div>
-                                    <div class="info-item"><div class="info-label">สามารถเดินทางไปทำงานต่างจังหวัดได้หรือไม่</div><div class="info-value">${app.workOutside}</div></div>
-                                    <div class="info-item"><div class="info-label">ถ้าต้องทำงานกับคนที่คุณไม่ชอบ</div><div class="info-value">${app.situation1}</div></div>
-                                    <div class="info-item"><div class="info-label">ถ้าคุณเห็นบุคคลใดทุจริตในบริษัท</div><div class="info-value">${app.situation2}</div></div>
-                                    <div class="info-item"><div class="info-label">ความสำเร็จที่ภูมิใจมากที่สุด</div><div class="info-value">${app.goal}</div></div>
-                                </div>
-                            </div>
+    // Map สถานะภาษาไทยเป็น class name
+    const statusClassMap = {
+        'ส่งใบสมัครแล้ว': 'status-pending',
+        'ไม่ผ่านการคัดกรอง': 'status-rejected',
+        'ไม่สามารถติดต่อได้': 'status-contacted',
+        'นัดสัมภาษณ์': 'status-interviewed',
+        'สัมภาษณ์แล้วไม่ผ่าน': 'status-failed',
+        'สัมภาษณ์แล้วผ่าน': 'status-passed',
+        'รายงานตัวผ่านทดสอบ': 'status-report',
+        'นัดเริ่มงาน': 'status-submit',
+        'สละสิทธิ์': 'status-renounce'
+    };
+    
+    const statusClass = statusClassMap[app.status] || 'status-pending';
+
+    const detailWindow = window.open('', '_blank');
+    detailWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="th">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>รายละเอียดผู้สมัคร - ${app.fullName}</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; padding: 20px; }
+                .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); overflow: hidden; }
+                .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; }
+                .header h1 { font-size: 28px; margin-bottom: 10px; }
+                .content { padding: 40px; }
+                .section { margin-bottom: 30px; }
+                .section-title { font-size: 20px; font-weight: bold; color: #667eea; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #667eea; display: flex; align-items: center; gap: 10px; }
+                .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                .info-grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+                .info-item { display: flex; flex-direction: column; gap: 5px; }
+                .info-label { font-size: 13px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+                .info-value.status-pending { color: #92400e; background-color: #fef3c7; }
+                .info-value.status-rejected { color: #991b1b; background-color: #fee2e2; }
+                .info-value.status-interviewed { color: #1e40af; background-color: #dbeafe; }
+                .info-value.status-passed { color: #3730a3; background-color: #c7d2fe; }
+                .info-value.status-failed { color: #92400e; background-color: #fed7aa; }
+                .info-value.status-contacted { color: #374151; background-color: #d1d5db; }
+                .info-value.status-report { color: #581c87; background-color: #f3e8ff; }
+                .info-value.status-renounce { color: #3f0f5c; background-color: #e0e7ff; }
+                .info-value.status-submit { color: #164e63; background-color: #cffafe; }
+                .info-value { font-size: 16px; color: #1f2937; font-weight: 500; padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea; }
+
+
+                /* Responsive สำหรับมือถือ */
+                @media (max-width: 768px) {
+                    body { padding: 10px; }
+                    .header { padding: 20px; }
+                    .header h1 { font-size: 22px; }
+                    .content { padding: 20px; }
+                    .section { margin-bottom: 25px; }
+                    .section-title { font-size: 18px; }
+                    
+                    /* ส่วนที่ต้องการ 2 column บนมือถือ */
+                    .info-grid-2col { 
+                        grid-template-columns: repeat(2, 1fr); 
+                        gap: 12px; 
+                    }
+                    
+                    /* ส่วนอื่นๆ ให้เป็น 1 column */
+                    .info-grid { 
+                        grid-template-columns: 1fr; 
+                        gap: 15px; 
+                    }
+                    
+                    .info-label { font-size: 11px; }
+                    .info-value { font-size: 14px; padding: 10px; }
+                    .status-badge { font-size: 14px; padding: 5px 10px; }
+                }
+
+                @media (max-width: 480px) {
+                    .header h1 { font-size: 18px; }
+                    .section-title { font-size: 16px; gap: 8px; }
+                    .info-grid-2col { gap: 10px; }
+                    .info-label { font-size: 10px; }
+                    .info-value { font-size: 13px; padding: 8px; }
+                    .status-badge { font-size: 13px; padding: 4px 8px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1><i class="fa-solid fa-user-circle"></i> รายละเอียดผู้สมัครงาน</h1>
+                </div>
+                <div class="content">
+                    <div class="section">
+                        <div class="section-title"><i class="fa-solid fa-id-card"></i> ข้อมูลส่วนตัว</div>
+                        <div class="info-grid-2col">
+                            <div class="info-item"><div class="info-label">ชื่อ-นามสกุล</div><div class="info-value">${app.fullName}</div></div>
+                            <div class="info-item"><div class="info-label">เบอร์โทร</div><div class="info-value">${app.phone}</div></div>
+                            <div class="info-item"><div class="info-label">วุฒิการศึกษา</div><div class="info-value">${app.certificate}</div></div>
+                            <div class="info-item"><div class="info-label">สาขา</div><div class="info-value">${app.faculty}</div></div>
+                            <div class="info-item"><div class="info-label">Line Phone</div><div class="info-value">${app.linePhone}</div></div>
+                            <div class="info-item"><div class="info-label">Line ID</div><div class="info-value">${app.lineId}</div></div>
+                            <div class="info-item"><div class="info-label">วันเกิด</div><div class="info-value">${app.birthDate}</div></div>
+                            <div class="info-item"><div class="info-label">อายุ</div><div class="info-value">${app.age}</div></div>
+                            <div class="info-item"><div class="info-label">น้ำหนัก</div><div class="info-value">${app.weight}</div></div>
+                            <div class="info-item"><div class="info-label">ความสูง</div><div class="info-value">${app.height}</div></div>
+                            <div class="info-item"><div class="info-label">ศาสนา</div><div class="info-value">${app.religion}</div></div>
+                            <div class="info-item"><div class="info-label">สุขภาพ ประวัติอาชญากรรม</div><div class="info-value">${app.healhty}</div></div>
+                            <div class="info-item"><div class="info-label">ทักษะ ความสามารถ</div><div class="info-value">${app.skill}</div></div>
                         </div>
                     </div>
-                </body>
-                </html>
-            `);
-            detailWindow.document.close();
-        }
+                    <div class="section">
+                        <div class="section-title"><i class="fa-solid fa-briefcase"></i> ข้อมูลการสมัครงาน</div>
+                        <div class="info-grid-2col">
+                            <div class="info-item"><div class="info-label">ตำแหน่ง</div><div class="info-value">${app.position}</div></div>
+                            <div class="info-item"><div class="info-label">สาขา</div><div class="info-value">${app.branch}</div></div>
+                            <div class="info-item"><div class="info-label">วันที่สมัครงาน</div><div class="info-value">${app.date}</div></div>
+                                                                <div class="info-item"><div class="info-label">สถานะ</div><div class="info-value ${statusClass}">${statusMap[app.status] || statusMap['pending']}</div></div>
+                            <div class="info-item"><div class="info-label">วันที่นัดสัมภาษณ์</div><div class="info-value">${app.interviewDate}</div></div>
+                            <div class="info-item"><div class="info-label">วันที่พร้อมเริ่มงาน</div><div class="info-value">${app.startDate}</div></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fa-solid fa-location-dot"></i> ข้อมูลการเดินทาง</div>
+                        <div class="info-grid-2col">
+                            <div class="info-item"><div class="info-label">ที่พักอาศัย</div><div class="info-value">${app.address}</div></div>
+                            <div class="info-item"><div class="info-label">ระยะทาง (KM)</div><div class="info-value">${app.distance}</div></div>
+                            <div class="info-item"><div class="info-label">ใบขับขี่</div><div class="info-value">${app.drivingLicense}</div></div>
+                            <div class="info-item"><div class="info-label">วิธีเดินทาง</div><div class="info-value">${app.transportation}</div></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> ประสบการณ์</div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">ประสบการณ์ปี 2566</div><div class="info-value">${app.experience66}</div></div>
+                            <div class="info-item"><div class="info-label">ประสบการณ์ปี 2567</div><div class="info-value">${app.experience67}</div></div>
+                            <div class="info-item"><div class="info-label">ประสบการณ์ปี 2568</div><div class="info-value">${app.experience68}</div></div>
+                            <div class="info-item"><div class="info-label">ประสบการณ์ด้านการขาย</div><div class="info-value">${app.saleExperience}</div></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fa-solid fa-folder"></i> อื่นๆ</div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">สาเหตุที่ลาออกจากงาน</div><div class="info-value">${app.reason}</div></div>
+                            <div class="info-item"><div class="info-label">สามารถเดินทางไปทำงานต่างจังหวัดได้หรือไม่</div><div class="info-value">${app.workOutside}</div></div>
+                            <div class="info-item"><div class="info-label">ถ้าต้องทำงานกับคนที่คุณไม่ชอบ</div><div class="info-value">${app.situation1}</div></div>
+                            <div class="info-item"><div class="info-label">ถ้าคุณเห็นบุคคลใดทุจริตในบริษัท</div><div class="info-value">${app.situation2}</div></div>
+                            <div class="info-item"><div class="info-label">ความสำเร็จที่ภูมิใจมากที่สุด</div><div class="info-value">${app.goal}</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    detailWindow.document.close();
+}
 
         function renderApplications() {
             const container = document.getElementById('applicationsContainer');
