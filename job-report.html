@@ -6,77 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Application Report</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="sidebar.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: white;
-            min-height: 100vh;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .page-title-header {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .hamburger {
-            width: 30px;
-            height: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .hamburger span {
-            display: block;
-            height: 3px;
-            background: #667eea;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .user-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
-
         .content {
             padding: 20px;
         }
@@ -103,42 +34,46 @@
         }
 
         .filter-btn {
-            padding: 8px 16px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: white;
+            border-radius: 25px;
+            background: white;
+            color: #667eea;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s ease;
         }
 
         .filter-btn:hover {
-            background: #5568d3;
+            background: #667eea;
+            color: white;
             transform: translateY(-2px);
         }
 
         .settings-btn {
-            padding: 8px 16px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 8px;
-            background: #ad6eec;
-            color: white;
+            border-radius: 25px;
+            background: white;
+            color: #667eea;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s ease;
         }
 
         .settings-btn:hover {
-            background: #764ba2;
+            background: #667eea;
+            color: white;
             transform: translateY(-2px);
         }
 
@@ -635,90 +570,6 @@
             font-weight: 600;
         }
 
-        .profile-menu {
-            position: absolute;
-            top: 60px;
-            right: 20px;
-            width: 220px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 101;
-            overflow: hidden;
-        }
-
-        .profile-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .profile-menu-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-menu-name {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .profile-menu-email {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .profile-menu-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #333;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .profile-menu-item i {
-            width: 20px;
-            color: #667eea;
-            font-size: 16px;
-        }
-
-        .profile-menu-item:hover {
-            background: #f8f9ff;
-            padding-left: 25px;
-        }
-
-        .profile-menu-item.logout {
-            color: #ff4444;
-            border-bottom: none;
-        }
-
-        .profile-menu-item.logout i {
-            color: #ff4444;
-        }
-
-        .profile-menu-item.logout:hover {
-            background: #fff5f5;
-        }
-
-        .user-profile {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .user-profile:hover {
-            transform: scale(1.05);
-        }
-
         /* Responsive Styles */
         @media (max-width: 768px) {
             .header {
@@ -973,34 +824,7 @@
 </head>
 
 <body>
-    <div class="header">
-        <div class="header-left">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="page-title-header">Job Applications</div>
-        </div>
-        <div class="user-profile" onclick="toggleProfileMenu()">JD</div>
-        <div class="profile-menu" id="profileMenu">
-            <div class="profile-menu-header">
-                <div class="profile-menu-name">John Doe</div>
-            </div>
-            <div class="profile-menu-item" onclick="goToProfile()">
-                <i class="fa-solid fa-user"></i>
-                <span>My Profile</span>
-            </div>
-            <div class="profile-menu-item" onclick="goToSettings()">
-                <i class="fa-solid fa-gear"></i>
-                <span>Settings</span>
-            </div>
-            <div class="profile-menu-item logout" onclick="logout()">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Log Out</span>
-            </div>
-        </div>
-    </div>
+    <div id="sidebar-container"></div>
 
     <div class="content">
         <div class="content-header">
@@ -1131,6 +955,79 @@
     </div>
 
     <script>
+        fetch('sidebar.html')
+            .then(res => res.text())
+            .then(html => {
+                const container = document.getElementById('sidebar-container');
+                container.innerHTML = html;
+
+                // 🧠 ดึง script ทั้งหมดจาก sidebar แล้วรันจริง
+                container.querySelectorAll('script').forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = oldScript.textContent;
+                    document.body.appendChild(newScript);
+                });
+
+                // ⏱️ รอให้ script โหลดเสร็จก่อนเรียกฟังก์ชัน
+                setTimeout(() => {
+                    console.log('🚀 Initializing sidebar functions...');
+
+                    // ตรวจสอบ login
+                    if (typeof checkUserLogin === 'function') {
+                        if (!checkUserLogin()) return;
+                    }
+
+                    // Highlight menu
+                    if (typeof highlightCurrentMenu === 'function') {
+                        highlightCurrentMenu();
+                    }
+
+                    // Update page title
+                    if (typeof updatePageTitle === 'function') {
+                        updatePageTitle();
+                    }
+
+                    // ✅ อัพเดทข้อมูลผู้ใช้
+                    if (typeof updateUserProfile === 'function') {
+                        updateUserProfile();
+                    }
+                }, 100);
+            })
+            .catch(error => {
+                console.error('❌ Error loading sidebar:', error);
+            });
+
+        // ✅ ฟังก์ชันแยกออกมาเรียกหลัง sidebar โหลดเสร็จ
+        function highlightCurrentMenu() {
+            const currentPage = window.location.pathname.split('/').pop();
+            document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
+                const onclick = item.getAttribute('onclick') || '';
+                if (onclick.includes(currentPage)) {
+                    item.classList.add('active');
+
+                    // ถ้าเป็น submenu → เปิดเมนูแม่ด้วย
+                    const submenu = item.closest('.submenu');
+                    if (submenu) {
+                        submenu.classList.add('open');
+                        const parentMenu = submenu.previousElementSibling;
+                        if (parentMenu) {
+                            parentMenu.classList.add('active');
+                            const arrow = parentMenu.querySelector('.arrow');
+                            if (arrow) arrow.classList.add('rotate');
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            const profileMenu = document.getElementById('profileMenu');
+            const userProfile = document.querySelector('.user-profile');
+
+            if (!profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
+                profileMenu.classList.remove('active');
+            }
+        });
         let allApplications = [];
         let allApplicationsRaw = []; // เก็บข้อมูลดิบก่อน filter
         let filteredApplications = [];
@@ -1282,12 +1179,14 @@
 
         function filterByUserBranches(applications) {
             if (!userBranches || userBranches.length === 0) {
-                console.log('No branch access, showing no data');
-                return [];
+                console.log('No branch access, showing only data without branch');
+                // แสดงเฉพาะข้อมูลที่ไม่มีสาขา
+                return applications.filter(app => !app.branch || app.branch === '-');
             }
 
             const filtered = applications.filter(app => {
-                return userBranches.includes(app.branch);
+                // แสดงข้อมูลที่ไม่มีสาขา หรือสาขาที่ user มีสิทธิ์เข้าถึง
+                return !app.branch || app.branch === '-' || userBranches.includes(app.branch);
             });
 
             console.log(`Filtered from ${applications.length} to ${filtered.length} applications based on branch access`);
@@ -1960,18 +1859,6 @@
 
         function goToSettings() {
             window.location.href = 'settings.html';
-        }
-
-        function toggleProfileMenu() {
-            const profileMenu = document.getElementById('profileMenu');
-            profileMenu.classList.toggle('active');
-        }
-
-        function logout() {
-            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
-                sessionStorage.removeItem('user');
-                window.location.href = 'index.html';
-            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {

@@ -1,0 +1,265 @@
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+    <div class="header-left">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="page-title-header">Workforce</div>
+    </div>
+
+    <div class="user-profile" onclick="toggleProfileMenu()">JD</div>
+    <div class="profile-menu" id="profileMenu">
+        <div class="profile-menu-header">
+            <div class="profile-menu-name">John Doe</div>
+        </div>
+        <div class="profile-menu-item">
+            <i class="fa-solid fa-user"></i>
+            <span>My Profile</span>
+        </div>
+        <div class="profile-menu-item">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </div>
+        <div class="profile-menu-item logout" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Out</span>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div class="overlay" onclick="closeSidebar()"></div>
+
+<div class="sidebar">
+    <div class="sidebar-header">Menu</div>
+
+    <div class="menu-item" onclick="selectMenu(this); window.location.href='dashboard.html'">Dashboard</div>
+
+    <div class="menu-item" onclick="selectMenu(this); window.location.href='job-report.html'">Recruit</div>
+
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        Part-time
+        <span class="arrow">▼</span>
+    </div>
+    <div class="submenu">
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='timesheet.html'">Hirelist</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member.html'">Workforce</div>
+    </div>
+
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        Marketplace
+        <span class="arrow">▼</span>
+    </div>
+    <div class="submenu">
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='product.html'">Product</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='order.html'">Order</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='return.html'">Return</div>
+    </div>
+
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        Document
+        <span class="arrow">▼</span>
+    </div>
+    <div class="submenu">
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='invoice.html'">Invoice</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='cn.html'">CN</div>
+    </div>
+
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        Report
+        <span class="arrow">▼</span>
+    </div>
+    <div class="submenu">
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='admin-report.html'">Admin Report
+        </div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-report.html'">User Report</div>
+    </div>
+
+    <div class="menu-item" onclick="toggleSubmenu(this)">
+        Setting
+        <span class="arrow">▼</span>
+    </div>
+    <div class="submenu">
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-setting.html'">User Setting
+        </div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='role-setting.html'">Role Setting
+        </div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member-setting.html'">Workforce Setting
+        </div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='location-setting.html'">Location
+            Setting</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='mission-setting.html'">Mission
+            Setting</div>
+    </div>
+</div>
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+    // ==================== SIDEBAR FUNCTIONS ====================
+
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.overlay');
+        const hamburger = document.querySelector('.hamburger');
+
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    }
+
+    function closeSidebar() {
+        document.querySelector('.sidebar')?.classList.remove('active');
+        document.querySelector('.overlay')?.classList.remove('active');
+        document.querySelector('.hamburger')?.classList.remove('active');
+    }
+
+    function toggleSubmenu(element) {
+        const submenu = element.nextElementSibling;
+        const arrow = element.querySelector('.arrow');
+
+        submenu.classList.toggle('open');
+        arrow.classList.toggle('rotate');
+    }
+
+    function selectMenu(element) {
+        document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
+        document.querySelectorAll('.arrow').forEach(arrow => arrow.classList.remove('rotate'));
+
+        element.classList.add('active');
+
+        const parentSubmenu = element.closest('.submenu');
+        if (parentSubmenu) {
+            parentSubmenu.classList.add('open');
+            const parentMenu = parentSubmenu.previousElementSibling;
+            if (parentMenu && parentMenu.classList.contains('menu-item')) {
+                parentMenu.classList.add('active');
+                const arrow = parentMenu.querySelector('.arrow');
+                if (arrow) arrow.classList.add('rotate');
+            }
+        }
+
+        closeSidebar();
+    }
+
+    function updatePageTitle() {
+        const pageTitle = document.querySelector('.page-title-header');
+        if (!pageTitle) return;
+
+        const fileName = window.location.pathname.split('/').pop().toLowerCase();
+
+        const pageTitles = {
+            'dashboard.html': 'Dashboard',
+            'job-report.html': 'Recruit',
+            'timesheet.html': 'Part-time',
+            'member.html': 'Workforce',
+            'product.html': 'Product',
+            'order.html': 'Order',
+            'return.html': 'Return',
+            'invoice.html': 'Invoice',
+            'cn.html': 'Credit Note',
+            'admin-report.html': 'Admin Report',
+            'user-report.html': 'User Report',
+            'user-setting.html': 'User Settings',
+            'role-setting.html': 'Role Settings',
+            'member-setting.html': 'Workforce Settings',
+            'location-setting.html': 'Location Settings',
+            'mission-setting.html': 'Mission Settings',
+        };
+
+        pageTitle.textContent = pageTitles[fileName] || fileName.replace('.html', '');
+    }
+
+    // ==================== USER PROFILE FUNCTIONS ====================
+
+    function updateUserProfile() {
+        console.log('🔄 updateUserProfile called');
+        const userDataStr = sessionStorage.getItem('user');
+        console.log('📦 User data from sessionStorage:', userDataStr);
+        
+        if (userDataStr) {
+            try {
+                const userInfo = JSON.parse(userDataStr);
+                console.log('✅ Parsed user info:', userInfo);
+
+                // อัพเดทชื่อในเมนู profile
+                const profileMenuName = document.querySelector('.profile-menu-name');
+                if (profileMenuName && userInfo.firstName && userInfo.lastName) {
+                    const fullName = `${userInfo.firstName} ${userInfo.lastName}`;
+                    profileMenuName.textContent = fullName;
+                    console.log('✅ Updated profile menu name:', fullName);
+                }
+
+                // อัพเดท initials ใน user profile button
+                const userProfile = document.querySelector('.user-profile');
+                if (userProfile && userInfo.firstName && userInfo.lastName) {
+                    const initials = `${userInfo.firstName.charAt(0)}${userInfo.lastName.charAt(0)}`;
+                    userProfile.textContent = initials.toUpperCase();
+                    userProfile.title = `${userInfo.firstName} ${userInfo.lastName}`;
+                    console.log('✅ Updated user profile initials:', initials.toUpperCase());
+                }
+
+            } catch (error) {
+                console.error('❌ Error updating user profile:', error);
+            }
+        } else {
+            console.warn('⚠️ No user data found in sessionStorage');
+        }
+    }
+
+    function toggleProfileMenu() {
+        const profileMenu = document.getElementById('profileMenu');
+        profileMenu.classList.toggle('active');
+    }
+
+    function checkUserLogin() {
+        const userDataStr = sessionStorage.getItem('user');
+        if (!userDataStr) {
+            alert('กรุณา Login ก่อนเข้าใช้งาน');
+            window.location.href = 'index.html';
+            return false;
+        }
+
+        try {
+            const userInfo = JSON.parse(userDataStr);
+            console.log('✅ User logged in:', userInfo);
+            return true;
+        } catch (error) {
+            console.error('❌ Error parsing user data:', error);
+            alert('เกิดข้อผิดพลาดในการอ่านข้อมูล User');
+            window.location.href = 'index.html';
+            return false;
+        }
+    }
+
+    function logout() {
+        if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+            sessionStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    function highlightCurrentMenu() {
+        const currentPage = window.location.pathname.split('/').pop();
+        document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
+            const onclick = item.getAttribute('onclick') || '';
+            if (onclick.includes(currentPage)) {
+                item.classList.add('active');
+                const submenu = item.closest('.submenu');
+                if (submenu) {
+                    submenu.classList.add('open');
+                    const parentMenu = submenu.previousElementSibling;
+                    if (parentMenu) {
+                        parentMenu.classList.add('active');
+                        const arrow = parentMenu.querySelector('.arrow');
+                        if (arrow) arrow.classList.add('rotate');
+                    }
+                }
+            }
+        });
+    }
+
+    // ⚠️ ลบ DOMContentLoaded ออก เพราะจะรันจาก timesheet.html แทน
+</script>
