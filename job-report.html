@@ -1201,22 +1201,23 @@
         }
 
         function filterByUserBranches(applications) {
-            // ✅ เพิ่ม: ตรวจสอบ role ของ user
-            if (userInfo && userInfo.role === 'Super') {
-                console.log('Super role: filtering out applications without branch');
-                // Super role ไม่เห็นข้อมูลที่ไม่มีสาขา
-                return applications.filter(app => app.branch && app.branch !== '-');
+            // ✅ เพิ่ม: ถ้าเป็น Admin ให้เห็นทุกอย่าง
+            if (userInfo && userInfo.role === 'Admin') {
+                console.log('Admin role: showing all applications');
+                return applications;
             }
 
+            // ตรวจสอบว่ามีสิทธิ์เข้าถึงสาขาหรือไม่
             if (!userBranches || userBranches.length === 0) {
-                console.log('No branch access, showing only data without branch');
-                // แสดงเฉพาะข้อมูลที่ไม่มีสาขา
-                return applications.filter(app => !app.branch || app.branch === '-');
+                console.log('No branch access, showing no data');
+                // ไม่แสดงข้อมูลเลยถ้าไม่มีสิทธิ์สาขา
+                return [];
             }
 
+            // กรองข้อมูลตามสาขาที่มีสิทธิ์เข้าถึงเท่านั้น (สำหรับ role อื่นๆ)
             const filtered = applications.filter(app => {
-                // แสดงข้อมูลที่ไม่มีสาขา หรือสาขาที่ user มีสิทธิ์เข้าถึง
-                return !app.branch || app.branch === '-' || userBranches.includes(app.branch);
+                // แสดงเฉพาะสาขาที่ user มีสิทธิ์เข้าถึง (ไม่รวมข้อมูลที่ไม่มีสาขา)
+                return app.branch && app.branch !== '-' && userBranches.includes(app.branch);
             });
 
             console.log(`Filtered from ${applications.length} to ${filtered.length} applications based on branch access`);
