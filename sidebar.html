@@ -31,18 +31,7 @@
 <div class="sidebar">
     <div class="sidebar-header">Menu</div>
 
-    <div class="menu-item" onclick="selectMenu(this); window.location.href='dashboard.html'">Dashboard</div>
-
     <div class="menu-item" onclick="selectMenu(this); window.location.href='job-report.html'">Recruit</div>
-
-    <div class="menu-item" onclick="toggleSubmenu(this)">
-        Part-time
-        <span class="arrow">▼</span>
-    </div>
-    <div class="submenu">
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='timesheet.html'">Daily List</div>
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member.html'">Freelancer</div>
-    </div>
 
     <div class="menu-item" onclick="toggleSubmenu(this)">
         Marketplace
@@ -443,4 +432,5 @@
         }
     });
     // ⚠️ ลบ DOMContentLoaded ออก เพราะจะรันจาก timesheet.html แทน
+
 </script>
