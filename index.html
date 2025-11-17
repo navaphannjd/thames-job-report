@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <style>
         * {
             margin: 0;
@@ -157,7 +157,46 @@
             box-shadow: none;
         }
 
-        /* Loading Animation */
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .register-link p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .register-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .register-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -190,8 +229,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-text {
@@ -225,7 +269,6 @@
             display: none;
         }
 
-        /* Error message */
         .error-message {
             background: #fee;
             color: #c33;
@@ -247,6 +290,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -257,7 +301,6 @@
             margin-right: 8px;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .login-form {
                 padding: 30px 25px;
@@ -294,7 +337,6 @@
 </head>
 
 <body>
-    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="spinner"></div>
@@ -319,10 +361,10 @@
 
             <form onsubmit="loginUser(event)">
                 <div class="form-group">
-                    <label for="username">ชื่อผู้ใช้</label>
+                    <label for="username">ล็อกอิน</label>
                     <div class="input-wrapper">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="username" name="username" placeholder="กรอกชื่อผู้ใช้" required>
+                        <input type="text" id="username" name="username" placeholder="กรอกล็อกอิน" required>
                     </div>
                 </div>
 
@@ -343,16 +385,26 @@
                     </div>
                 </button>
             </form>
+
+            <div class="register-link">
+                <p>ยังไม่มีบัญชีผู้ใช้?</p>
+                <a href="register.html" class="register-btn">
+                    <i class="fas fa-user-plus"></i>
+                    สมัครสมาชิก
+                </a>
+            </div>
         </div>
     </div>
 
     <script>
+        const API_BASE = 'http://45.136.237.60:3000';
+
         function showError(message) {
             const errorElement = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
             errorText.textContent = message;
             errorElement.classList.add('show');
-            
+
             setTimeout(() => {
                 errorElement.classList.remove('show');
             }, 5000);
@@ -370,64 +422,150 @@
             document.getElementById('loginBtn').classList.remove('loading');
         }
 
-        function handleLoginResponse(result) {
-            console.log('Response received:', result);
-            
-            hideLoading();
-            
+        // Callback สำหรับ Google Sheets
+        function handleGoogleSheetsResponse(result) {
+            console.log('Google Sheets Response:', result);
+
             if (result.result === "success") {
+                // เก็บข้อมูลจาก Google Sheets
                 sessionStorage.setItem('user', JSON.stringify({
+                    loginId: result.username || '',
                     firstName: result.firstName,
                     lastName: result.lastName,
                     role: result.role,
-                    branchInfo: result.branchInfo
+                    branchInfo: result.branchInfo,
+                    source: 'google_sheets'
                 }));
-                
-                // แสดงข้อความสำเร็จก่อนเปลี่ยนหน้า
+
                 const loadingText = document.querySelector('.loading-text');
                 loadingText.textContent = 'เข้าสู่ระบบสำเร็จ!';
-                document.getElementById('loadingOverlay').classList.add('show');
-                
+
                 setTimeout(() => {
-                    window.location.href = "job-report.html";
+                    window.location.href = "dashboard.html";
                 }, 800);
             } else {
+                hideLoading();
                 showError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
             }
         }
 
-        function loginUser(event) {
+        // ลอง Login ผ่าน MySQL ก่อน
+        async function tryMySQLLogin(username, password) {
+            try {
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        loginId: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+                console.log('MySQL Response:', result);
+                console.log('🔍 Locations from API:', result.user?.locations);
+                console.log('🔍 Locations type:', typeof result.user?.locations);
+                console.log('🔍 Locations length:', result.user?.locations?.length);
+
+                if (response.ok && result.success) {
+                    // เช็คสถานะ active
+                    if (result.user.active === 0 || result.user.active === '0') {
+                        hideLoading();
+                        showError("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+                        return true;
+                    }
+
+                    // Login สำเร็จผ่าน MySQL
+                    sessionStorage.setItem('user', JSON.stringify({
+                        id: result.user.id,
+                        loginId: result.user.loginId,
+                        password: result.user.password,
+                        employeeId: result.user.employeeId,
+                        firstName: result.user.firstName,
+                        lastName: result.user.lastName,
+                        citizenId: result.user.citizenId,
+                        nickname: result.user.nickname,
+                        mobile: result.user.mobile,
+                        address: result.user.address,
+                        province: result.user.province,
+                        postalCode: result.user.postalCode,
+                        email: result.user.email,
+                        role: result.user.role,
+                        locations: result.user.locations,
+                        source: 'mysql'
+                    }));
+
+
+                    console.log('💾 Saved to sessionStorage:', JSON.parse(sessionStorage.getItem('user')));
+
+                    const loadingText = document.querySelector('.loading-text');
+                    loadingText.textContent = 'เข้าสู่ระบบสำเร็จ!';
+
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 800);
+
+                    return true;
+                }
+
+                if (response.status === 403) {
+                    hideLoading();
+                    showError(result.message || "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+                    return true;
+                }
+
+                return false;
+            } catch (error) {
+                console.error('MySQL Login Error:', error);
+                return false;
+            }
+        }
+
+        // ลอง Login ผ่าน Google Sheets
+        function tryGoogleSheetsLogin(username, password) {
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxp6qoWZ36xcBuj7wteNFbyL4dF3EvzI2_XpfO5zYkUEb1odl60nQQUOlZB3gw4QNrfWA/exec';
+
+            const url = scriptURL +
+                '?username=' + encodeURIComponent(username) +
+                '&password=' + encodeURIComponent(password) +
+                '&callback=handleGoogleSheetsResponse';
+
+            const script = document.createElement('script');
+            script.src = url;
+            script.onerror = function () {
+                hideLoading();
+                showError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+            };
+            document.body.appendChild(script);
+        }
+
+        async function loginUser(event) {
             event.preventDefault();
 
-            var userName = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            if (!userName || !password) {
+            if (!username || !password) {
                 showError("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน");
                 return;
             }
 
             showLoading();
 
-            var scriptURL = 'https://script.google.com/macros/s/AKfycbxp6qoWZ36xcBuj7wteNFbyL4dF3EvzI2_XpfO5zYkUEb1odl60nQQUOlZB3gw4QNrfWA/exec';
-            
-            console.log('Attempting login for:', userName);
-            
-            var url = scriptURL + 
-                '?username=' + encodeURIComponent(userName) + 
-                '&password=' + encodeURIComponent(password) +
-                '&callback=handleLoginResponse';
+            console.log('Attempting login for:', username);
 
-            var script = document.createElement('script');
-            script.src = url;
-            script.onerror = function() {
-                hideLoading();
-                showError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
-            };
-            document.body.appendChild(script);
+            // ลอง MySQL ก่อน
+            const mysqlSuccess = await tryMySQLLogin(username, password);
+
+            // ถ้า MySQL ไม่สำเร็จ ให้ลอง Google Sheets
+            if (!mysqlSuccess) {
+                console.log('MySQL login failed, trying Google Sheets...');
+                tryGoogleSheetsLogin(username, password);
+            }
         }
     </script>
 </body>
-
 
 </html>

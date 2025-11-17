@@ -256,6 +256,37 @@ body {
     font-weight: 600;
 }
 
+/* ==================== NESTED SUBMENU ==================== */
+.submenu-nested {
+    background: #e8edff;
+    padding-left: 0;
+}
+
+.submenu-nested .submenu-item {
+    padding-left: 60px;
+    background: #e8edff;
+}
+
+.submenu-nested .submenu-item:hover {
+    background: #d8e3ff;
+    padding-left: 65px;
+}
+
+.submenu-nested .submenu-item.active {
+    background: #d0dcff;
+    padding-left: 60px;
+}
+
+.submenu-item .arrow {
+    float: right;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.submenu-item.has-submenu {
+    position: relative;
+}
+
 .arrow {
     transition: transform 0.3s ease;
     font-size: 12px;

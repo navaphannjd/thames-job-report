@@ -991,6 +991,10 @@
                     if (typeof updateUserProfile === 'function') {
                         updateUserProfile();
                     }
+
+                    if (typeof updateMenuByRole === 'function') {
+                        updateMenuByRole();
+                    }
                 }, 100);
             })
             .catch(error => {
@@ -1020,14 +1024,33 @@
             });
         }
 
+        // ==================== CLICK OUTSIDE HANDLERS ====================
         document.addEventListener('click', function (e) {
             const profileMenu = document.getElementById('profileMenu');
             const userProfile = document.querySelector('.user-profile');
+            const editDropdown = document.getElementById('editDropdown');
+            const editBtn = document.getElementById('editBtn');
 
-            if (!profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
+            if (profileMenu && userProfile && !profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
                 profileMenu.classList.remove('active');
             }
+
+            if (editDropdown && editBtn && !editDropdown.contains(e.target) && !editBtn.contains(e.target)) {
+                closeEditDropdown();
+            }
         });
+
+        window.onclick = function (event) {
+            const filterModal = document.getElementById('filterModal');
+            const statusChangeModal = document.getElementById('statusChangeModal');
+
+            if (event.target == filterModal) {
+                closeFilterModal();
+            }
+            if (event.target == statusChangeModal) {
+                closeStatusChangeModal();
+            }
+        }
         let allApplications = [];
         let allApplicationsRaw = []; // เก็บข้อมูลดิบก่อน filter
         let filteredApplications = [];
@@ -1178,6 +1201,13 @@
         }
 
         function filterByUserBranches(applications) {
+            // ✅ เพิ่ม: ตรวจสอบ role ของ user
+            if (userInfo && userInfo.role === 'Super') {
+                console.log('Super role: filtering out applications without branch');
+                // Super role ไม่เห็นข้อมูลที่ไม่มีสาขา
+                return applications.filter(app => app.branch && app.branch !== '-');
+            }
+
             if (!userBranches || userBranches.length === 0) {
                 console.log('No branch access, showing only data without branch');
                 // แสดงเฉพาะข้อมูลที่ไม่มีสาขา
@@ -1809,6 +1839,10 @@
                                     <div class="detail-label">ประสบการณ์ปี 2568</div>
                                     <div class="detail-value">${app.experience68}</div>
                                 </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">รายได้ล่าสุด</div>
+                                    <div class="detail-value">${app.oldSalary}</div>
+                                </div>
                             </div>
                             <div class="detail-more-btn-container">
                                 <button class="detail-more-btn" onclick="openDetailPage(${app.id})">
@@ -1867,14 +1901,33 @@
             }
         });
 
+        // ==================== CLICK OUTSIDE HANDLERS ====================
         document.addEventListener('click', function (e) {
             const profileMenu = document.getElementById('profileMenu');
             const userProfile = document.querySelector('.user-profile');
+            const editDropdown = document.getElementById('editDropdown');
+            const editBtn = document.getElementById('editBtn');
 
-            if (!profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
+            if (profileMenu && userProfile && !profileMenu.contains(e.target) && !userProfile.contains(e.target)) {
                 profileMenu.classList.remove('active');
             }
+
+            if (editDropdown && editBtn && !editDropdown.contains(e.target) && !editBtn.contains(e.target)) {
+                closeEditDropdown();
+            }
         });
+
+        window.onclick = function (event) {
+            const filterModal = document.getElementById('filterModal');
+            const statusChangeModal = document.getElementById('statusChangeModal');
+
+            if (event.target == filterModal) {
+                closeFilterModal();
+            }
+            if (event.target == statusChangeModal) {
+                closeStatusChangeModal();
+            }
+        }
     </script>
 </body>
 

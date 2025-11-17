@@ -1,26 +1,22 @@
 <!-- ==================== HEADER ==================== -->
 <div class="header">
     <div class="header-left">
-        <div class="hamburger">
+        <div class="hamburger" onclick="toggleSidebar()">
             <span></span>
             <span></span>
             <span></span>
         </div>
-        <div class="page-title-header">Workforce</div>
+        <div class="page-title-header"></div>
     </div>
 
-    <div class="user-profile" onclick="toggleProfileMenu()">JD</div>
+    <div class="user-profile" onclick="toggleProfileMenu()"></div>
     <div class="profile-menu" id="profileMenu">
         <div class="profile-menu-header">
-            <div class="profile-menu-name">John Doe</div>
+            <div class="profile-menu-name"></div>
         </div>
-        <div class="profile-menu-item">
+        <div class="profile-menu-item" onclick="goToProfile()">
             <i class="fa-solid fa-user"></i>
             <span>My Profile</span>
-        </div>
-        <div class="profile-menu-item">
-            <i class="fa-solid fa-gear"></i>
-            <span>Settings</span>
         </div>
         <div class="profile-menu-item logout" onclick="logout()">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -44,8 +40,8 @@
         <span class="arrow">▼</span>
     </div>
     <div class="submenu">
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='timesheet.html'">Hirelist</div>
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member.html'">Workforce</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='timesheet.html'">Daily List</div>
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member.html'">Freelancer</div>
     </div>
 
     <div class="menu-item" onclick="toggleSubmenu(this)">
@@ -74,7 +70,16 @@
     <div class="submenu">
         <div class="submenu-item" onclick="selectMenu(this); window.location.href='admin-report.html'">Admin Report
         </div>
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-report.html'">User Report</div>
+        <div class="submenu-item" onclick="toggleSubmenu(this)">
+            User Report
+            <span class="arrow">▼</span>
+        </div>
+        <div class="submenu submenu-nested">
+            <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-report.html'">Report 1
+            </div>
+            <div class="submenu-item" onclick="selectMenu(this); window.location.href='#'">Report 2
+            </div>
+        </div>
     </div>
 
     <div class="menu-item" onclick="toggleSubmenu(this)">
@@ -82,16 +87,16 @@
         <span class="arrow">▼</span>
     </div>
     <div class="submenu">
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-setting.html'">User Setting
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='user-setting.html'">User
         </div>
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='role-setting.html'">Role Setting
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='role-setting.html'">Role
         </div>
-        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member-setting.html'">Workforce Setting
+        <div class="submenu-item" onclick="selectMenu(this); window.location.href='member-setting.html'">Freelancer
         </div>
         <div class="submenu-item" onclick="selectMenu(this); window.location.href='location-setting.html'">Location
-            Setting</div>
+        </div>
         <div class="submenu-item" onclick="selectMenu(this); window.location.href='mission-setting.html'">Mission
-            Setting</div>
+        </div>
     </div>
 </div>
 
@@ -151,22 +156,40 @@
         const fileName = window.location.pathname.split('/').pop().toLowerCase();
 
         const pageTitles = {
-            'dashboard.html': 'Dashboard',
-            'job-report.html': 'Recruit',
-            'timesheet.html': 'Part-time',
-            'member.html': 'Workforce',
-            'product.html': 'Product',
-            'order.html': 'Order',
-            'return.html': 'Return',
-            'invoice.html': 'Invoice',
-            'cn.html': 'Credit Note',
+            'add-invoice.html': 'Add Invoice',
+            'add-product.html': 'Add Product',
             'admin-report.html': 'Admin Report',
+            'dashboard.html': 'Dashboard',
+            'edit-invoice.html': 'Edit Invoice',
+            'invoice.html': 'Invoice',
+            'job-report.html': 'Recruit',
+            'location-add.html': 'Add Location',
+            'location-edit.html': 'Edit Location',
+            'location-setting.html': 'Settings',
+            'member-add.html': 'Add Freelancer',
+            'member-edit.html': 'Edit Freelancer',
+            'member-setting.html': 'Settings',
+            'member.html': 'Freelancer',
+            'mission-add.html': 'Add Mission',
+            'mission-edit.html': 'Edit Mission',
+            'mission-setting.html': 'Settings',
+            'order-add.html': 'Add Order',
+            'order.html': 'Order',
+            'product-stock-add.html': 'Add Product',
+            'product-stock-edit.html': 'Edit Product',
+            'profile-edit.html': 'User Profile',
+            'product.html': 'Product',
+            'role-add.html': 'Add Role',
+            'role-edit.html': 'Edit Role',
+            'role-setting.html': 'Settings',
+            'settings.html': 'User Management',
+            'timesheet-add.html': 'Add Daily List',
+            'timesheet-edit.html': 'Edit Daily List',
+            'timesheet.html': 'Part-time',
+            'user-add.html': 'Add User',
+            'user-edit.html': 'Edit User',
             'user-report.html': 'User Report',
-            'user-setting.html': 'User Settings',
-            'role-setting.html': 'Role Settings',
-            'member-setting.html': 'Workforce Settings',
-            'location-setting.html': 'Location Settings',
-            'mission-setting.html': 'Mission Settings',
+            'user-setting.html': 'Settings',
         };
 
         pageTitle.textContent = pageTitles[fileName] || fileName.replace('.html', '');
@@ -175,49 +198,49 @@
     // ==================== USER PROFILE FUNCTIONS ====================
 
     function updateUserProfile() {
-    console.log('📄 updateUserProfile called');
-    const userDataStr = sessionStorage.getItem('user');
-    console.log('📦 User data from sessionStorage:', userDataStr);
-    
-    if (userDataStr) {
-        try {
-            const userInfo = JSON.parse(userDataStr);
-            console.log('✅ Parsed user info:', userInfo);
+        console.log('📄 updateUserProfile called');
+        const userDataStr = sessionStorage.getItem('user');
+        console.log('📦 User data from sessionStorage:', userDataStr);
 
-            // อัพเดทชื่อในเมนู profile
-            const profileMenuName = document.querySelector('.profile-menu-name');
-            if (profileMenuName && userInfo.firstName) {
-                // แสดงชื่อ-นามสกุล ถ้ามีทั้งคู่ / แสดงแค่ชื่อ ถ้ามีแค่ชื่อ
-                const fullName = userInfo.lastName 
-                    ? `${userInfo.firstName} ${userInfo.lastName}` 
-                    : userInfo.firstName;
-                profileMenuName.textContent = fullName;
-                console.log('✅ Updated profile menu name:', fullName);
+        if (userDataStr) {
+            try {
+                const userInfo = JSON.parse(userDataStr);
+                console.log('✅ Parsed user info:', userInfo);
+
+                // อัพเดทชื่อในเมนู profile
+                const profileMenuName = document.querySelector('.profile-menu-name');
+                if (profileMenuName && userInfo.firstName) {
+                    // แสดงชื่อ-นามสกุล ถ้ามีทั้งคู่ / แสดงแค่ชื่อ ถ้ามีแค่ชื่อ
+                    const fullName = userInfo.lastName
+                        ? `${userInfo.firstName} ${userInfo.lastName}`
+                        : userInfo.firstName;
+                    profileMenuName.textContent = fullName;
+                    console.log('✅ Updated profile menu name:', fullName);
+                }
+
+                // อัพเดท initials ใน user profile button
+                const userProfile = document.querySelector('.user-profile');
+                if (userProfile && userInfo.firstName) {
+                    // ถ้ามีนามสกุล → แสดง initials 2 ตัว / ถ้าไม่มี → แสดงแค่ตัวแรกของชื่อ
+                    const initials = userInfo.lastName
+                        ? `${userInfo.firstName.charAt(0)}${userInfo.lastName.charAt(0)}`
+                        : userInfo.firstName.charAt(0);
+                    userProfile.textContent = initials.toUpperCase();
+
+                    const fullName = userInfo.lastName
+                        ? `${userInfo.firstName} ${userInfo.lastName}`
+                        : userInfo.firstName;
+                    userProfile.title = fullName;
+                    console.log('✅ Updated user profile initials:', initials.toUpperCase());
+                }
+
+            } catch (error) {
+                console.error('❌ Error updating user profile:', error);
             }
-
-            // อัพเดท initials ใน user profile button
-            const userProfile = document.querySelector('.user-profile');
-            if (userProfile && userInfo.firstName) {
-                // ถ้ามีนามสกุล → แสดง initials 2 ตัว / ถ้าไม่มี → แสดงแค่ตัวแรกของชื่อ
-                const initials = userInfo.lastName 
-                    ? `${userInfo.firstName.charAt(0)}${userInfo.lastName.charAt(0)}`
-                    : userInfo.firstName.charAt(0);
-                userProfile.textContent = initials.toUpperCase();
-                
-                const fullName = userInfo.lastName 
-                    ? `${userInfo.firstName} ${userInfo.lastName}` 
-                    : userInfo.firstName;
-                userProfile.title = fullName;
-                console.log('✅ Updated user profile initials:', initials.toUpperCase());
-            }
-
-        } catch (error) {
-            console.error('❌ Error updating user profile:', error);
+        } else {
+            console.warn('⚠️ No user data found in sessionStorage');
         }
-    } else {
-        console.warn('⚠️ No user data found in sessionStorage');
     }
-}
 
     function toggleProfileMenu() {
         const profileMenu = document.getElementById('profileMenu');
@@ -243,6 +266,132 @@
             return false;
         }
     }
+
+    // ==================== ROLE-BASED MENU FUNCTIONS ====================
+
+    function updateMenuByRole() {
+        console.log('🔒 Checking user role for menu access');
+        const userDataStr = sessionStorage.getItem('user');
+
+        if (!userDataStr) {
+            console.warn('⚠️ No user data found');
+            return;
+        }
+
+        try {
+            const userInfo = JSON.parse(userDataStr);
+            const userRole = userInfo.role;
+            console.log('👤 User role:', userRole);
+
+            // ถ้า role คือ "Default" ให้แสดง Dashboard + Part-time (รวม submenu ทั้งหมด)
+            if (userRole === 'Default') {
+                console.log('🚫 Default role detected - showing only Dashboard and Part-time (with full submenu)');
+
+                // ซ่อนเมนูทั้งหมดก่อน
+                const allMenuItems = document.querySelectorAll('.sidebar > .menu-item');
+                allMenuItems.forEach(item => {
+                    const menuText = item.textContent.trim();
+
+                    // แสดงเฉพาะ Dashboard และ Part-time
+                    if (menuText.includes('Dashboard') || menuText.includes('Part-time')) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+
+                        // ซ่อน submenu ที่เกี่ยวข้องด้วย
+                        const nextSubmenu = item.nextElementSibling;
+                        if (nextSubmenu && nextSubmenu.classList.contains('submenu')) {
+                            nextSubmenu.style.display = 'none';
+                        }
+                    }
+                });
+
+                // แสดง submenu ทั้งหมดภายใต้ Part-time
+                const allSubmenus = document.querySelectorAll('.sidebar > .submenu');
+                allSubmenus.forEach(submenu => {
+                    const prevMenu = submenu.previousElementSibling;
+                    if (prevMenu && prevMenu.textContent.trim().includes('Part-time')) {
+                        submenu.style.display = '';
+
+                        // แสดง submenu-item ทั้งหมดใน Part-time
+                        const submenuItems = submenu.querySelectorAll('.submenu-item');
+                        submenuItems.forEach(item => {
+                            item.style.display = '';
+                        });
+                    }
+                });
+
+            } else if(userRole === 'Super'){
+                console.log('🚫 Supervisor role detected - showing only Dashboard, Part-time and recuit');
+
+                // ซ่อนเมนูทั้งหมดก่อน
+                const allMenuItems = document.querySelectorAll('.sidebar > .menu-item');
+                allMenuItems.forEach(item => {
+                    const menuText = item.textContent.trim();
+
+                    // แสดงเฉพาะ Dashboard และ Part-time
+                    if (menuText.includes('Dashboard') || menuText.includes('Part-time') || menuText.includes('Recruit')) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+
+                        // ซ่อน submenu ที่เกี่ยวข้องด้วย
+                        const nextSubmenu = item.nextElementSibling;
+                        if (nextSubmenu && nextSubmenu.classList.contains('submenu')) {
+                            nextSubmenu.style.display = 'none';
+                        }
+                    }
+                });
+
+                // แสดง submenu ทั้งหมดภายใต้ Part-time
+                const allSubmenus = document.querySelectorAll('.sidebar > .submenu');
+                allSubmenus.forEach(submenu => {
+                    const prevMenu = submenu.previousElementSibling;
+                    if (prevMenu && prevMenu.textContent.trim().includes('Part-time')) {
+                        submenu.style.display = '';
+
+                        // แสดง submenu-item ทั้งหมดใน Part-time
+                        const submenuItems = submenu.querySelectorAll('.submenu-item');
+                        submenuItems.forEach(item => {
+                            item.style.display = '';
+                        });
+                    }
+                });
+            } else {
+                console.log('✅ Full menu access granted');
+                // role อื่นๆ เห็นทุกเมนู
+                const allMenuItems = document.querySelectorAll('.sidebar .menu-item, .sidebar .submenu, .sidebar .submenu-item');
+                allMenuItems.forEach(item => {
+                    item.style.display = '';
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error parsing user data:', error);
+        }
+    }
+
+
+
+
+    function goToProfile() {
+        // ✅ ปิด popup ก่อนเปลี่ยนหน้า
+        const profileMenu = document.getElementById('profileMenu');
+        if (profileMenu) profileMenu.classList.remove('active');
+
+        const userDataStr = sessionStorage.getItem('user');
+        if (userDataStr) {
+            try {
+                const userInfo = JSON.parse(userDataStr);
+                window.location.href = `profile-edit.html?id=${userInfo.id}`;
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                window.location.href = 'profile-edit.html';
+            }
+        } else {
+            window.location.href = 'profile-edit.html';
+        }
+    }
+
 
     function logout() {
         if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
@@ -271,5 +420,27 @@
         });
     }
 
+    // ==================== INITIALIZE ON LOAD ====================
+
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('📱 Sidebar initialized');
+        checkUserLogin();
+        updateUserProfile();
+        updatePageTitle();
+        highlightCurrentMenu();
+        updateMenuByRole(); // ✅ เพิ่มบรรทัดนี้
+    });
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function (event) {
+        const profileMenu = document.getElementById('profileMenu');
+        const userProfile = document.querySelector('.user-profile');
+
+        if (profileMenu && userProfile) {
+            if (!profileMenu.contains(event.target) && !userProfile.contains(event.target)) {
+                profileMenu.classList.remove('active');
+            }
+        }
+    });
     // ⚠️ ลบ DOMContentLoaded ออก เพราะจะรันจาก timesheet.html แทน
 </script>
