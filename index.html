@@ -441,7 +441,7 @@
                 loadingText.textContent = 'เข้าสู่ระบบสำเร็จ!';
 
                 setTimeout(() => {
-                    window.location.href = "job-report.html";
+                    window.location.href = "dashboard.html";
                 }, 800);
             } else {
                 hideLoading();
@@ -494,6 +494,7 @@
                         email: result.user.email,
                         role: result.user.role,
                         locations: result.user.locations,
+                        token: result.token,
                         source: 'mysql'
                     }));
 
@@ -525,21 +526,24 @@
 
         // ลอง Login ผ่าน Google Sheets
         function tryGoogleSheetsLogin(username, password) {
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxp6qoWZ36xcBuj7wteNFbyL4dF3EvzI2_XpfO5zYkUEb1odl60nQQUOlZB3gw4QNrfWA/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyxD1zJ3zkX53qSKHzejxkGE8d_HTt5yCoXGlPYo5P8eFYZk0gmYl6Qn1o5B4CqsI9hWQ/exec';
 
             const url = scriptURL +
-                '?username=' + encodeURIComponent(username) +
-                '&password=' + encodeURIComponent(password) +
-                '&callback=handleGoogleSheetsResponse';
+                '?action=login' +
+                '&username=' + encodeURIComponent(username) +
+                '&password=' + encodeURIComponent(password);
 
-            const script = document.createElement('script');
-            script.src = url;
-            script.onerror = function () {
-                hideLoading();
-                showError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
-            };
-            document.body.appendChild(script);
+            fetch(url)
+                .then(res => res.json())
+                .then(data => handleGoogleSheetsResponse(data))
+                .catch(err => {
+                    hideLoading();
+                    showError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+                });
         }
+
+
+
 
         async function loginUser(event) {
             event.preventDefault();
@@ -567,6 +571,5 @@
         }
     </script>
 </body>
-
 
 </html>
