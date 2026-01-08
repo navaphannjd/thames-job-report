@@ -1423,11 +1423,19 @@
                         const lastEditby = item.lasteditby || '';
                         const status = item.status || 'ส่งใบสมัครแล้ว';
 
+                        // ✅ เพิ่มส่วนนี้ - สร้าง formattedDate และ dateObj
+                        let formattedDate = timestamp;
                         let dateObj = null;
                         try {
                             if (timestamp && timestamp !== '-') {
                                 dateObj = new Date(timestamp);
-                                if (isNaN(dateObj.getTime())) {
+                                if (!isNaN(dateObj.getTime())) {
+                                    formattedDate = dateObj.toLocaleDateString('th-TH', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit'
+                                    });
+                                } else {
                                     console.warn('Invalid date:', timestamp);
                                     dateObj = null;
                                 }
@@ -1476,12 +1484,12 @@
                             situation2: situation2,
                             address: address,
                             religion: religion,
-                            dateObj: dateObj,
                             lastEditby: lastEditby,
                             status: status || 'ส่งใบสมัครแล้ว'
                         };
                     });
 
+                    // ✅ Sort โดยใช้ dateObj และจัดการ null
                     allApplications.sort((a, b) => {
                         try {
                             const dateA = a.dateObj ? a.dateObj.getTime() : 0;
