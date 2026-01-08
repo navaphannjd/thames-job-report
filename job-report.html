@@ -1114,10 +1114,12 @@
                 // Reset to original order (sorted by date descending)
                 filteredApplications.sort((a, b) => {
                     try {
-                        const dateA = new Date(a.timestamp || 0);
-                        const dateB = new Date(b.timestamp || 0);
+                        // ✅ ใช้ dateObj ที่เป็น Date object อยู่แล้ว แทนการแปลง timestamp
+                        const dateA = a.dateObj || new Date(0);
+                        const dateB = b.dateObj || new Date(0);
                         return dateB - dateA;
                     } catch (e) {
+                        console.error('Sort error:', e);
                         return 0;
                     }
                 });
@@ -1132,10 +1134,12 @@
                     } else {
                         // If same branch, sort by date (most recent first)
                         try {
-                            const dateA = new Date(a.timestamp || 0);
-                            const dateB = new Date(b.timestamp || 0);
+                            // ✅ ใช้ dateObj แทน timestamp
+                            const dateA = a.dateObj || new Date(0);
+                            const dateB = b.dateObj || new Date(0);
                             return dateB - dateA;
                         } catch (e) {
+                            console.error('Sort error:', e);
                             return 0;
                         }
                     }
@@ -1420,21 +1424,18 @@
                         const lastEditby = item.lasteditby || '';
                         const status = item.status || 'ส่งใบสมัครแล้ว';
 
-                        let formattedDate = timestamp;
                         let dateObj = null;
                         try {
                             if (timestamp && timestamp !== '-') {
                                 dateObj = new Date(timestamp);
-                                if (!isNaN(dateObj.getTime())) {
-                                    formattedDate = dateObj.toLocaleDateString('th-TH', {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        day: '2-digit'
-                                    });
+                                if (isNaN(dateObj.getTime())) {
+                                    console.warn('Invalid date:', timestamp);
+                                    dateObj = null;
                                 }
                             }
                         } catch (e) {
-                            console.log('Error parsing date:', e);
+                            console.error('Error parsing date:', e);
+                            dateObj = null;
                         }
 
                         return {
@@ -1476,6 +1477,7 @@
                             situation2: situation2,
                             address: address,
                             religion: religion,
+                            dateObj: dateObj,
                             lastEditby: lastEditby,
                             status: status || 'ส่งใบสมัครแล้ว'
                         };
@@ -1483,15 +1485,22 @@
 
                     allApplications.sort((a, b) => {
                         try {
-                            const dateA = new Date(a.timestamp || 0);
-                            const dateB = new Date(b.timestamp || 0);
+                            const dateA = a.dateObj || new Date(0);
+                            const dateB = b.dateObj || new Date(0);
                             return dateB - dateA;
                         } catch (e) {
+                            console.error('Initial sort error:', e);
                             return 0;
                         }
                     });
 
-                    allApplicationsRaw = [...allApplications]; // เก็บข้อมูลดิบไว้ก่อน filter
+                    // เพิ่ม log เพื่อ debug
+                    console.log('First 5 after sort:');
+                    allApplications.slice(0, 5).forEach(app => {
+                        console.log(app.date, app.dateObj, app.fullName);
+                    });
+
+                    allApplicationsRaw = [...allApplications];
                     allApplications = filterByUserBranches(allApplications);
 
                     filteredApplications = [...allApplications];
