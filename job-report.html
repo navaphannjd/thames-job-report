@@ -1114,9 +1114,9 @@
                 // Reset to original order (sorted by date descending)
                 filteredApplications.sort((a, b) => {
                     try {
-                        // ✅ ใช้ dateObj ที่เป็น Date object อยู่แล้ว แทนการแปลง timestamp
-                        const dateA = a.dateObj || new Date(0);
-                        const dateB = b.dateObj || new Date(0);
+                        // ✅ จัดการกรณี dateObj เป็น null
+                        const dateA = a.dateObj ? a.dateObj.getTime() : 0;
+                        const dateB = b.dateObj ? b.dateObj.getTime() : 0;
                         return dateB - dateA;
                     } catch (e) {
                         console.error('Sort error:', e);
@@ -1129,14 +1129,13 @@
                     const branchCompare = a.branch.localeCompare(b.branch, 'th');
 
                     if (branchCompare !== 0) {
-                        // If branches are different, sort by branch order
                         return branchSortOrder === 'asc' ? branchCompare : -branchCompare;
                     } else {
                         // If same branch, sort by date (most recent first)
                         try {
-                            // ✅ ใช้ dateObj แทน timestamp
-                            const dateA = a.dateObj || new Date(0);
-                            const dateB = b.dateObj || new Date(0);
+                            // ✅ จัดการกรณี dateObj เป็น null
+                            const dateA = a.dateObj ? a.dateObj.getTime() : 0;
+                            const dateB = b.dateObj ? b.dateObj.getTime() : 0;
                             return dateB - dateA;
                         } catch (e) {
                             console.error('Sort error:', e);
@@ -1485,8 +1484,8 @@
 
                     allApplications.sort((a, b) => {
                         try {
-                            const dateA = a.dateObj || new Date(0);
-                            const dateB = b.dateObj || new Date(0);
+                            const dateA = a.dateObj ? a.dateObj.getTime() : 0;
+                            const dateB = b.dateObj ? b.dateObj.getTime() : 0;
                             return dateB - dateA;
                         } catch (e) {
                             console.error('Initial sort error:', e);
